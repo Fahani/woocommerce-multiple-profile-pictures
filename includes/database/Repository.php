@@ -25,6 +25,20 @@ class Repository {
 	}
 
 	/**
+	 * Removes a picture (row) given a picture id
+	 *
+	 * @param int $mpp_user_picture_id
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	function delete_picture_by_picture_id( $mpp_user_picture_id ) {
+		$sql = "DELETE FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE mpp_user_picture_id = %d";
+
+		$this->db->query( $this->db->prepare( $sql, $mpp_user_picture_id ) );
+	}
+
+	/**
 	 * Returns, given an user id, all the pictures of an user that aren't his main picture.
 	 *
 	 * @param int $user_id

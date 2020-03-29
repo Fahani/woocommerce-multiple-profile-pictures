@@ -64,9 +64,59 @@ class MultiUpload implements RegisterAction {
 	 */
 	public function update_profile() {
 		if ( isset ( $_POST["wmpp"] ) ) {
+			$this->delete_selected_pictures();
 			$this->set_main_picture();
 			$this->upload_new_picture();
 		}
+	}
+
+	/**
+	 * Deletes from folder and from db the checked pictures by the user
+	 * @return void
+	 * @since 1.0.0
+	 */
+	private function delete_selected_pictures() {
+		if ( isset( $_POST['remove'] ) ) {
+			foreach ( $_POST['remove'] as $pic_id ) {
+				$pic_to_remove = $this->repository->get_picture_by_picture_id_and_user_id( $pic_id, wp_get_current_user()->ID );
+
+				if ( empty( $pic_to_remove ) ) {
+					wc_add_notice(
+						sprintf(
+							__( 'You can not delete a picture with id(%s)', 'wmpp' ),
+							$pic_id
+						),
+						'error' );
+					continue;
+				}
+
+				if ( ! $this->delete_from_uploads( $pic_to_remove[0]['pic_name'] ) ) {
+					wc_add_notice(
+						sprintf(
+							__( 'There was an error deleting the picture id(%s)', 'wmpp' ),
+							$pic_id ),
+						'error' );
+					continue;
+				}
+
+				$this->repository->delete_picture_by_picture_id( $pic_id );
+
+
+				wc_add_notice( sprintf( __( 'Picture deleted id(%s)', 'wmpp' ), $pic_id ), 'success' );
+			}
+		}
+	}
+
+	/**
+	 * Removes a file from the the path: wp-content/uploads/wmpp/users
+	 *
+	 * @param string $filename
+	 *
+	 * @return bool
+	 * @since 1.0.0
+	 */
+	private function delete_from_uploads( $filename ) {
+		return unlink( wp_upload_dir()['basedir'] . '/wmpp/users/' . $filename );
 	}
 
 	/**
