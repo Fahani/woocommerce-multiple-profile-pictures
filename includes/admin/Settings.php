@@ -3,6 +3,7 @@
 namespace WMPP\admin;
 
 use MultipleProfilePictures;
+use WMPP\interfaces\RegisterAction;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
 
@@ -10,7 +11,7 @@ defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
  * Takes care of setting up the Setting page and the settings link into the plugin page
  * @package WMPP\admin
  */
-class Settings {
+class Settings implements RegisterAction {
 
 	/**
 	 * Registers the needed actions and filters to set up the Settings page.

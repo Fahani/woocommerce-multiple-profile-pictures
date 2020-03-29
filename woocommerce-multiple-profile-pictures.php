@@ -16,6 +16,7 @@
  */
 
 use WMPP\admin\Settings;
+use WMPP\interfaces\RegisterAction;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
 
@@ -33,7 +34,7 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
  *
  * @since 1.0.0
  */
-class MultipleProfilePictures {
+class MultipleProfilePictures implements RegisterAction {
 
 	/** the plugin name, for displaying notices */
 	const PLUGIN_NAME = 'WooCommerce Multiple Profile Pictures';
