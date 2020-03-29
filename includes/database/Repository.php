@@ -25,6 +25,80 @@ class Repository {
 	}
 
 	/**
+	 * Returns, given an user id, all the pictures of an user that aren't his main picture.
+	 *
+	 * @param int $user_id
+	 *
+	 * @return array|object|null
+	 * @since 1.0.0
+	 *
+	 */
+	function get_no_main_pictures_by_user_id( $user_id ) {
+		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE active = 0 and user_id = %d";
+
+		return $this->db->get_results( $this->db->prepare( $sql, $user_id ), ARRAY_A );
+	}
+
+	/**
+	 * Returns the main picture of an user given his id
+	 *
+	 * @param int $user_id
+	 *
+	 * @return array|object|null
+	 * @since 1.0.0
+	 *
+	 */
+	function get_main_picture_by_user_id( $user_id ) {
+		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE active = 1 and user_id = %d";
+
+		return $this->db->get_results( $this->db->prepare( $sql, $user_id ), ARRAY_A );
+	}
+
+	/**
+	 * Returns a picture given a picture id and an user id
+	 *
+	 * @param int $mpp_user_picture_id
+	 * @param int $user_id
+	 *
+	 * @return array|object|null
+	 * @since 1.0.0
+	 */
+	function get_picture_by_picture_id_and_user_id( $mpp_user_picture_id, $user_id ) {
+		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE mpp_user_picture_id = %d and user_id = %d";
+
+		return $this->db->get_results( $this->db->prepare( $sql, $mpp_user_picture_id, $user_id ), ARRAY_A );
+	}
+
+	/**
+	 * It unsets the main picture of the given user id
+	 *
+	 * @param int $user_id
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	function unset_main_picture_by_user_id( $user_id ) {
+		$sql = "UPDATE `{$this->db->prefix}woocommerce_mpp_user_picture` SET active=0 WHERE active=1 and user_id = %d";
+
+		$this->db->query( $this->db->prepare( $sql, $user_id ) );
+	}
+
+	/**
+	 * It sets a picture as main picture given its id
+	 *
+	 * @param int $mpp_user_picture_id
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	function set_main_picture_by_picture_id( $mpp_user_picture_id ) {
+		$sql = "UPDATE `{$this->db->prefix}woocommerce_mpp_user_picture` SET active=1 WHERE mpp_user_picture_id = %d";
+
+		$this->db->query( $this->db->prepare( $sql, $mpp_user_picture_id ) );
+	}
+
+
+	/**
 	 * Returns the number of pictures an user as by its id
 	 *
 	 * @param int $user_id

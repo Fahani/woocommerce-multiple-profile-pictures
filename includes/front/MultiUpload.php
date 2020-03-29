@@ -64,7 +64,37 @@ class MultiUpload implements RegisterAction {
 	 */
 	public function update_profile() {
 		if ( isset ( $_POST["wmpp"] ) ) {
+			$this->set_main_picture();
 			$this->upload_new_picture();
+		}
+	}
+
+	/**
+	 * It sets as main profile picture the one selected by the user
+	 * @return void
+	 * @since 1.0.0
+	 */
+	private function set_main_picture() {
+		if ( isset ( $_POST['main'] ) ) {
+			$pic_to_set_main = $this->repository->get_picture_by_picture_id_and_user_id( $_POST["main"], wp_get_current_user()->ID );
+			if ( empty( $pic_to_set_main ) ) {
+				wc_add_notice(
+					sprintf(
+						__( 'The picture id(%s) can not be set as main picture, it does not exist', 'wmpp' ),
+						$_POST['main']
+					)
+					, 'error' );
+			} else {
+				$this->repository->unset_main_picture_by_user_id( wp_get_current_user()->ID );
+				$this->repository->set_main_picture_by_picture_id( $_POST['main'] );
+
+				wc_add_notice(
+					sprintf(
+						__( 'Picture id(%s) set as your main picture.', 'wmpp' ),
+						$_POST['main']
+					),
+					'success' );
+			}
 		}
 	}
 
@@ -172,6 +202,10 @@ class MultiUpload implements RegisterAction {
 	 * @since 1.0.0
 	 */
 	public function add_picture_selection_to_form() {
+		$main_picture  = $this->repository->get_main_picture_by_user_id( wp_get_current_user()->ID );
+		$num_pics_user = $this->repository->get_number_pics_by_user( wp_get_current_user()->ID );
+		$num_max_pics  = get_option( 'max_profile_pictures' );
+		$rest_pictures = $this->repository->get_no_main_pictures_by_user_id( wp_get_current_user()->ID );
 		include( WMPP_DIR_PATH . 'templates/myaccount/add-picture-selection-to-form.php' );
 	}
 

@@ -5,3 +5,19 @@
 .padding-05-em {
     padding: 0.5em;
 }
+
+.inline {
+    display: inline;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.block {
+    display: block;
+}
+
+.negative-top-margin-10px {
+    margin-top: -10px;
+}
