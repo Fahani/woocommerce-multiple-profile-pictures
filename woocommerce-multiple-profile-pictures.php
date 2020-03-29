@@ -15,12 +15,15 @@
  *
  */
 
+use WMPP\admin\Settings;
+
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
 
 if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
 	require_once dirname( __FILE__ ) . '/vendor/autoload.php';
 }
 
+define( 'WMPP_DIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WMPP_BASENAME', plugin_basename( __FILE__ ) );
 
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
@@ -49,7 +52,12 @@ class MultipleProfilePictures {
 	/** @var MultipleProfilePictures */
 	protected static $instance;
 
-	public function __construct() {
+	/** @var Settings */
+	protected $settings;
+
+
+	public function __construct( Settings $settings ) {
+		$this->settings = $settings;
 
 	}
 
@@ -116,7 +124,17 @@ class MultipleProfilePictures {
 		if ( is_plugin_active( WMPP_BASENAME ) ) {
 			add_action( 'init', [ $this, 'load_translation' ] );
 			add_action( 'plugins_loaded', [ $this, 'check_wc_active' ] );
+			add_action( 'plugins_loaded', [ $this, 'load_plugin_dependencies' ] );
 		}
+	}
+
+	/**
+	 * It fires up the injected dependencies.
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function load_plugin_dependencies() {
+		$this->settings->register();
 	}
 
 	/**
@@ -162,12 +180,15 @@ class MultipleProfilePictures {
 
 	/**
 	 * Ensures only one instance is set.
+	 *
+	 * @param Settings $settings
+	 *
 	 * @return MultipleProfilePictures
 	 * @since 1.0.0
 	 */
-	public static function instance(): MultipleProfilePictures {
+	public static function instance( Settings $settings ): MultipleProfilePictures {
 		if ( is_null( self::$instance ) ) {
-			self::$instance = new self();
+			self::$instance = new self( $settings );
 		}
 
 		return self::$instance;
@@ -175,6 +196,6 @@ class MultipleProfilePictures {
 }
 
 // Fire it up! :)
-$my_plugin = MultipleProfilePictures::instance();
+$my_plugin = MultipleProfilePictures::instance( new Settings() );
 $my_plugin->register();
 $my_plugin->load_plugins();
