@@ -39,6 +39,7 @@ class Order implements RegisterAction {
 		add_action( 'woocommerce_admin_order_data_after_order_details', [ $this, 'insert_picture_in_order_detail' ] );
 		add_filter( 'manage_edit-shop_order_columns', [ $this, 'insert_new_picture_column' ] );
 		add_action( 'manage_shop_order_posts_custom_column', [ $this, 'insert_picture_in_column' ], 10, 2 );
+		add_action( 'before_delete_post', [ $this, 'delete_order_picture_info' ], 10, 1 );
 	}
 
 	/**
@@ -117,6 +118,29 @@ class Order implements RegisterAction {
 			$order_picture = $this->repository->get_picture_by_order_id( $order_id );
 			if ( ! empty( $order_picture ) ) {
 				include( WMPP_DIR_PATH . 'templates/admin/orders/order-preview-display-small-picture.php' );
+			}
+		}
+	}
+
+	/**
+	 * Deletes the picture file in (wp-content/uploads/wmpp/orders) and also remove the row in wp_woocommerce_mpp_order_picture
+	 *
+	 * @param int $order_id
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function delete_order_picture_info( $order_id ) {
+		global $post_type;
+
+		if ( $post_type !== 'shop_order' ) {
+			return;
+		}
+
+		$order_picture = $this->repository->get_picture_by_order_id( $order_id );
+		if ( ! empty( $order_picture ) ) {
+			if ( unlink( wp_upload_dir()['basedir'] . '/wmpp/orders/' . $order_picture[0]['pic_name'] ) ) {
+				$this->repository->delete_order_picture_by_order_id( $order_id );
 			}
 		}
 	}

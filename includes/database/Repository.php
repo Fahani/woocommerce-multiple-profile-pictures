@@ -25,6 +25,20 @@ class Repository {
 	}
 
 	/**
+	 * Removes a row (picture) by order id
+	 *
+	 * @param int $order_id
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function delete_order_picture_by_order_id( $order_id ) {
+		$sql = "DELETE FROM `{$this->db->prefix}woocommerce_mpp_order_picture` WHERE order_id = %d";
+
+		$this->db->query( $this->db->prepare( $sql, $order_id ) );
+	}
+
+	/**
 	 * Returns of the pictures of the given user id
 	 *
 	 * @param int $user_id
