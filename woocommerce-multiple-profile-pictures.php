@@ -27,6 +27,7 @@ if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
 }
 
 define( 'WMPP_DIR_PATH', plugin_dir_path( __FILE__ ) );
+define( 'WMPP_PLUGIN_URL', plugins_url( '', __FILE__ ) );
 define( 'WMPP_BASENAME', plugin_basename( __FILE__ ) );
 
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
