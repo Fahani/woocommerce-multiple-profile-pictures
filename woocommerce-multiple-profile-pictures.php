@@ -17,6 +17,7 @@
 
 use WMPP\admin\Settings;
 use WMPP\database\Repository;
+use WMPP\front\MultiUpload;
 use WMPP\interfaces\RegisterAction;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
@@ -60,11 +61,13 @@ class MultipleProfilePictures implements RegisterAction {
 	/** @var Repository */
 	protected $repository;
 
+	/** @var MultiUpload */
+	protected $multi_upload;
 
-	public function __construct( Settings $settings, Repository $repository ) {
-		$this->settings   = $settings;
-		$this->repository = $repository;
-
+	public function __construct( Settings $settings, Repository $repository, MultiUpload $multi_upload ) {
+		$this->settings     = $settings;
+		$this->repository   = $repository;
+		$this->multi_upload = $multi_upload;
 	}
 
 	/**
@@ -170,6 +173,7 @@ class MultipleProfilePictures implements RegisterAction {
 	 */
 	public function load_plugin_dependencies() {
 		$this->settings->register();
+		$this->multi_upload->register();
 	}
 
 	/**
@@ -218,13 +222,14 @@ class MultipleProfilePictures implements RegisterAction {
 	 *
 	 * @param Settings $settings
 	 * @param Repository $repository
+	 * @param MultiUpload $multi_upload
 	 *
 	 * @return MultipleProfilePictures
 	 * @since 1.0.0
 	 */
-	public static function instance( Settings $settings, Repository $repository ): MultipleProfilePictures {
+	public static function instance( Settings $settings, Repository $repository, MultiUpload $multi_upload ): MultipleProfilePictures {
 		if ( is_null( self::$instance ) ) {
-			self::$instance = new self( $settings, $repository );
+			self::$instance = new self( $settings, $repository, $multi_upload );
 		}
 
 		return self::$instance;
@@ -232,6 +237,6 @@ class MultipleProfilePictures implements RegisterAction {
 }
 
 // Fire it up! :)
-$my_plugin = MultipleProfilePictures::instance( new Settings(), new Repository() );
+$my_plugin = MultipleProfilePictures::instance( new Settings(), new Repository(), new MultiUpload() );
 $my_plugin->register();
 $my_plugin->load_plugins();
