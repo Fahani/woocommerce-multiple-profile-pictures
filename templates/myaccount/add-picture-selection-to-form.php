@@ -18,6 +18,9 @@
         <small class="block">ID: <?php echo $main_picture[0]['mpp_user_picture_id'] ?></small>
         <label><?php _e( 'To delete', 'wmpp' ) ?></label>
         <input type="checkbox" name="remove[]" value="<?php echo $main_picture[0]['mpp_user_picture_id'] ?>">
+        <br><br>
+        <span><?php _e( 'Do you want to replace the main picture? You can upload the replacement here', 'wmpp' ) ?></span><br>
+        <input type="file" name="replace_main_picture">
     </div>
 <?php } ?>
 

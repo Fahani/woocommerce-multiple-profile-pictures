@@ -58,7 +58,7 @@ class MultiUpload implements RegisterAction {
 	}
 
 	/**
-	 * Process user's action when submitting the form. Using wmpp post variable to make sure it is our form.
+	 * Processes user's action when submitting the form. Using wmpp post variable to make sure it is our form.
 	 * @return void
 	 * @since 1.0.0
 	 */
@@ -66,7 +66,48 @@ class MultiUpload implements RegisterAction {
 		if ( isset ( $_POST["wmpp"] ) ) {
 			$this->delete_selected_pictures();
 			$this->set_main_picture();
+			$this->replace_main_picture();
 			$this->upload_new_picture();
+		}
+	}
+
+	/**
+	 * Processes user's action to replace his main picture
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	private function replace_main_picture() {
+		if ( isset( $_FILES["replace_main_picture"] ) && $_FILES["replace_main_picture"]['size'] > 0 ) {
+			$name      = $_FILES['replace_main_picture']['name'];
+			$temp_name = $_FILES['replace_main_picture']['tmp_name'];
+
+			$picture_id = $this->save_picture( $temp_name );
+			if ( $picture_id === false ) {
+				wc_add_notice(
+					sprintf(
+						__( 'There was an error uploading your picture %s', 'wmpp' ),
+						$name ),
+					'error' );
+			} else {
+				$main_picture = $this->repository->get_main_picture_by_user_id( wp_get_current_user()->ID );
+
+				if ( empty( $main_picture ) ) {
+					$this->repository->set_main_picture_by_picture_id( $picture_id );
+					wc_add_notice( __( 'Profile replaced', 'wmpp' ), 'success' );
+				} elseif ( $this->delete_from_uploads( $main_picture[0]['pic_name'] ) ) {
+					$this->repository->delete_picture_by_picture_id( $main_picture[0]['mpp_user_picture_id'] );
+					$this->repository->set_main_picture_by_picture_id( $picture_id );
+					wc_add_notice( __( 'Profile replaced', 'wmpp' ), 'success' );
+				} else {
+					wc_add_notice(
+						sprintf(
+							__( 'There was an error deleting the picture id(%s)', 'wmpp' ),
+							$main_picture[0]['mpp_user_picture_id']
+						),
+						'error' );
+				}
+			}
 		}
 	}
 
@@ -78,7 +119,10 @@ class MultiUpload implements RegisterAction {
 	private function delete_selected_pictures() {
 		if ( isset( $_POST['remove'] ) ) {
 			foreach ( $_POST['remove'] as $pic_id ) {
-				$pic_to_remove = $this->repository->get_picture_by_picture_id_and_user_id( $pic_id, wp_get_current_user()->ID );
+				$pic_to_remove = $this->repository->get_picture_by_picture_id_and_user_id(
+					$pic_id,
+					wp_get_current_user()->ID
+				);
 
 				if ( empty( $pic_to_remove ) ) {
 					wc_add_notice(
@@ -100,7 +144,6 @@ class MultiUpload implements RegisterAction {
 				}
 
 				$this->repository->delete_picture_by_picture_id( $pic_id );
-
 
 				wc_add_notice( sprintf( __( 'Picture deleted id(%s)', 'wmpp' ), $pic_id ), 'success' );
 			}
@@ -126,7 +169,10 @@ class MultiUpload implements RegisterAction {
 	 */
 	private function set_main_picture() {
 		if ( isset ( $_POST['main'] ) ) {
-			$pic_to_set_main = $this->repository->get_picture_by_picture_id_and_user_id( $_POST["main"], wp_get_current_user()->ID );
+			$pic_to_set_main = $this->repository->get_picture_by_picture_id_and_user_id(
+				$_POST["main"],
+				wp_get_current_user()->ID
+			);
 			if ( empty( $pic_to_set_main ) ) {
 				wc_add_notice(
 					sprintf(
