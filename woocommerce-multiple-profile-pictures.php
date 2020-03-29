@@ -236,8 +236,9 @@ class MultipleProfilePictures implements RegisterAction {
 		return self::$instance;
 	}
 }
+$repository = new Repository();
 
 // Fire it up! :)
-$my_plugin = MultipleProfilePictures::instance( new Settings(), new Repository(), new MultiUpload() );
+$my_plugin = MultipleProfilePictures::instance( new Settings(),$repository , new MultiUpload($repository) );
 $my_plugin->register();
 $my_plugin->load_plugins();

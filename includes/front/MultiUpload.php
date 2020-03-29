@@ -2,6 +2,8 @@
 
 namespace WMPP\front;
 
+use WMPP\database\Repository;
+use WMPP\helpers\Utils;
 use WMPP\interfaces\RegisterAction;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
@@ -12,12 +14,35 @@ defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
  */
 class MultiUpload implements RegisterAction {
 
+	/** @var array */
+	protected $valid_mimes;
+
+	/** @var array */
+	protected $valid_formats;
+
+	/** @var Repository */
+	private $repository;
+
+	/**
+	 * Initializes class attributes
+	 *
+	 * @param Repository $repository
+	 *
+	 * @since 1.0.0
+	 */
+	public function __construct( Repository $repository ) {
+		$this->repository    = $repository;
+		$this->valid_mimes   = [ 'image/png', 'image/jpeg', 'image/bmp', 'image/x-ms-bmp' ];
+		$this->valid_formats = [ 'png', 'jpeg', 'bmp' ];
+	}
+
 	/**
 	 * Registers the actions to insert the picture inside the Account details form
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public function register() {
+		add_action( 'template_redirect', [ $this, 'update_profile' ], 5 );
 		add_action( 'woocommerce_before_edit_account_form', [ $this, 'enqueue_assets' ] );
 		add_action( 'woocommerce_edit_account_form_tag', [ $this, 'add_multipart_to_form' ] );
 		add_action( 'woocommerce_edit_account_form', [ $this, 'add_picture_selection_to_form' ] );
@@ -30,6 +55,105 @@ class MultiUpload implements RegisterAction {
 	 */
 	public function enqueue_assets() {
 		wp_enqueue_style( 'wmpp_style', WMPP_PLUGIN_URL . '/assets/css/style.css' );
+	}
+
+	/**
+	 * Process user's action when submitting the form. Using wmpp post variable to make sure it is our form.
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function update_profile() {
+		if ( isset ( $_POST["wmpp"] ) ) {
+			$this->upload_new_picture();
+		}
+	}
+
+	/**
+	 * This function takes care of the action of uploading a new picture
+	 * @return void
+	 * @since 1.0.0
+	 */
+	private function upload_new_picture() {
+		if ( isset ( $_FILES['profile_pictures'] ) && $_FILES['profile_pictures']['size'][0] > 0 ) {
+
+			$num_pics = count( $_FILES['profile_pictures']['size'] );
+
+			for ( $i = 0; $i < $num_pics; $i ++ ) {
+				$name      = $_FILES['profile_pictures']['name'][ $i ];
+				$temp_name = $_FILES['profile_pictures']['tmp_name'][ $i ];
+
+				$num_pics_user = $this->repository->get_number_pics_by_user( wp_get_current_user()->ID );
+				$num_max_pics  = get_option( 'max_profile_pictures' );
+
+				if ( $num_max_pics != - 1 && $num_pics_user >= $num_max_pics ) {
+					wc_add_notice(
+						sprintf(
+							__( 'You have reached the maximum of pics you can upload (%s). %s will not be uploaded', 'wmpp' ),
+							$num_max_pics, $name
+						)
+						, 'error' );
+					break;
+				}
+
+				$picture_id = $this->save_picture( $temp_name );
+
+				if ( $picture_id === false ) {
+					continue;
+				}
+
+				wc_add_notice( sprintf( __( 'Your picture %s has been uploaded', 'wmpp' ), $name ), 'success' );
+			}
+		}
+	}
+
+	/**
+	 * This function takes of saving the picture into the uploads folder and into the wp_woocommerce_mpp_user_picture table
+	 *
+	 * @param string $temp_name
+	 *
+	 * @return false|int
+	 */
+	private function save_picture( $temp_name ) {
+		$mime = wp_get_image_mime( $temp_name );
+
+		if ( ! in_array( $mime, $this->valid_mimes ) ) {
+			wc_add_notice(
+				sprintf(
+					__( 'Invalid image format, please try one of these formats: %s', 'wmpp' ),
+					implode( ', ', $this->valid_formats )
+				)
+				, 'error' );
+
+			return false;
+		}
+
+		$editor = wp_get_image_editor( $temp_name );
+
+		if ( is_wp_error( $editor ) ) {
+			wc_add_notice( $editor->get_error_message(), 'error' );
+
+			return false;
+		}
+
+		$result = $editor->resize( 150, 150, false );
+
+		if ( is_wp_error( $result ) ) {
+			wc_add_notice( $editor->get_error_message(), 'error' );
+
+			return false;
+		}
+
+		$final_name = Utils::generate_name( $mime );
+
+		$result = $editor->save( wp_upload_dir()['basedir'] . "/wmpp/users/$final_name" );
+
+		if ( is_wp_error( $result ) ) {
+			wc_add_notice( $editor->get_error_message(), 'error' );
+
+			return false;
+		}
+
+		return $this->repository->insert_picture( wp_get_current_user()->ID, "$final_name", $mime, 0 );
 	}
 
 	/**

@@ -5,3 +5,4 @@
 </div>
 <br>
 <strong><?php echo __( 'Remember to save the form to apply changes', 'wmpp' ) ?></strong>
+<input type="hidden" name="wmpp">
