@@ -54,13 +54,67 @@ class MultipleProfilePictures {
 	}
 
 	/**
+	 * Registers all the one time actions needed for this plugin to work
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function register() {
+		register_activation_hook( __FILE__, [ $this, 'activation_check' ] );
+	}
+
+	/**
+	 * Checks the server environment and other factors and deactivates plugins as necessary.
+	 *
+	 * Based on http://wptavern.com/how-to-prevent-wordpress-plugins-from-activating-on-sites-with-incompatible-hosting-environments
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function activation_check() {
+		if ( ! version_compare( PHP_VERSION, self::MINIMUM_PHP_VERSION, '>=' ) ) {
+			$this->deactivate_and_die( self::PLUGIN_NAME, 'PHP', self::MINIMUM_PHP_VERSION, PHP_VERSION );
+		}
+
+		if ( ! version_compare( get_bloginfo( 'version' ), self::MINIMUM_WP_VERSION, '>=' ) ) {
+			$this->deactivate_and_die( self::PLUGIN_NAME, 'WordPress', self::MINIMUM_WP_VERSION, get_bloginfo( 'version' ) );
+		}
+
+		if ( ! ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, self::MINIMUM_WC_VERSION, '>=' ) ) ) {
+			$this->deactivate_and_die( self::PLUGIN_NAME, 'WooCommerce', self::MINIMUM_WC_VERSION, defined( 'WC_VERSION' ) ? WC_VERSION : '0' );
+		}
+	}
+
+	/**
+	 * Deactivates the plugin and shows an informative message with the missing requirement
+	 *
+	 * @param string $plugin_name Name of the plugin
+	 * @param string $requirement The requirement
+	 * @param string $version_needed Minimum version needed
+	 * @param string $current_version Current version
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	protected function deactivate_and_die( $plugin_name, $requirement, $version_needed, $current_version ) {
+		deactivate_plugins( WMPP_BASENAME );
+
+		wp_die( sprintf(
+				__( '%1$s could not be activated. The minimum %2$s version required for this plugin is %3$s. You are running %4$s.', 'wmpp' ),
+				$plugin_name,
+				$requirement,
+				$version_needed,
+				$current_version )
+		);
+	}
+
+
+	/**
 	 * Loads all necessary actions after the plugin has been activated
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public function load_plugins() {
 		if ( is_plugin_active( WMPP_BASENAME ) ) {
-			add_action( 'init', array( $this, 'load_translation' ) );
+			add_action( 'init', [ $this, 'load_translation' ] );
 		}
 	}
 
@@ -107,5 +161,6 @@ class MultipleProfilePictures {
 }
 
 // Fire it up! :)
-$myPlugin = MultipleProfilePictures::instance();
-$myPlugin->load_plugins();
+$my_plugin = MultipleProfilePictures::instance();
+$my_plugin->register();
+$my_plugin->load_plugins();
