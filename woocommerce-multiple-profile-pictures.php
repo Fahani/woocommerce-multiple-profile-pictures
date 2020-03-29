@@ -16,6 +16,7 @@
  */
 
 use WMPP\admin\Settings;
+use WMPP\database\Repository;
 use WMPP\interfaces\RegisterAction;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
@@ -56,9 +57,13 @@ class MultipleProfilePictures implements RegisterAction {
 	/** @var Settings */
 	protected $settings;
 
+	/** @var Repository */
+	protected $repository;
 
-	public function __construct( Settings $settings ) {
-		$this->settings = $settings;
+
+	public function __construct( Settings $settings, Repository $repository ) {
+		$this->settings   = $settings;
+		$this->repository = $repository;
 
 	}
 
@@ -69,7 +74,10 @@ class MultipleProfilePictures implements RegisterAction {
 	 */
 	public function register() {
 		register_activation_hook( __FILE__, [ $this, 'activation_check' ] );
+		register_activation_hook( __FILE__, [ $this, 'create_database' ] );
+		register_activation_hook( __FILE__, [ $this, 'create_directories' ] );
 	}
+
 
 	/**
 	 * Checks the server environment and other factors and deactivates plugins as necessary.
@@ -90,6 +98,32 @@ class MultipleProfilePictures implements RegisterAction {
 		if ( ! ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, self::MINIMUM_WC_VERSION, '>=' ) ) ) {
 			$this->deactivate_and_die( self::PLUGIN_NAME, 'WooCommerce', self::MINIMUM_WC_VERSION, defined( 'WC_VERSION' ) ? WC_VERSION : '0' );
 		}
+	}
+
+	/**
+	 * Creates the structure of folders inside uploads. Where the pictures for users and orders will be stored.
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function create_directories() {
+		if ( ! is_dir( wp_upload_dir()['basedir'] . '/wmpp' ) ) {
+			mkdir( wp_upload_dir()['basedir'] . '/wmpp', 0755 );
+		}
+		if ( ! is_dir( wp_upload_dir()['basedir'] . '/wmpp/users' ) ) {
+			mkdir( wp_upload_dir()['basedir'] . '/wmpp/users', 0755 );
+		}
+		if ( ! is_dir( wp_upload_dir()['basedir'] . '/wmpp/orders' ) ) {
+			mkdir( wp_upload_dir()['basedir'] . '/wmpp/orders', 0755 );
+		}
+	}
+
+	/**
+	 * Creates the needed tables for this plugin
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function create_database() {
+		$this->repository->create_tables();
 	}
 
 	/**
@@ -183,13 +217,14 @@ class MultipleProfilePictures implements RegisterAction {
 	 * Ensures only one instance is set.
 	 *
 	 * @param Settings $settings
+	 * @param Repository $repository
 	 *
 	 * @return MultipleProfilePictures
 	 * @since 1.0.0
 	 */
-	public static function instance( Settings $settings ): MultipleProfilePictures {
+	public static function instance( Settings $settings, Repository $repository ): MultipleProfilePictures {
 		if ( is_null( self::$instance ) ) {
-			self::$instance = new self( $settings );
+			self::$instance = new self( $settings, $repository );
 		}
 
 		return self::$instance;
@@ -197,6 +232,6 @@ class MultipleProfilePictures implements RegisterAction {
 }
 
 // Fire it up! :)
-$my_plugin = MultipleProfilePictures::instance( new Settings() );
+$my_plugin = MultipleProfilePictures::instance( new Settings(), new Repository() );
 $my_plugin->register();
 $my_plugin->load_plugins();
