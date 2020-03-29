@@ -115,6 +115,20 @@ class MultipleProfilePictures {
 	public function load_plugins() {
 		if ( is_plugin_active( WMPP_BASENAME ) ) {
 			add_action( 'init', [ $this, 'load_translation' ] );
+			add_action( 'plugins_loaded', [ $this, 'check_wc_active' ] );
+		}
+	}
+
+	/**
+	 * Checks if WooCommerce is still active after our plugin is activated. If not, it shows a message in the admin area.
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function check_wc_active() {
+		if ( ! defined( 'WC_VERSION' ) ) {
+			add_action( 'admin_notices', function () {
+				include( WMPP_DIR_PATH . 'templates/admin/error-woocommerce-not-found.php' );
+			} );
 		}
 	}
 
