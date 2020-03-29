@@ -15,6 +15,7 @@
  *
  */
 
+use WMPP\admin\DeleteUser;
 use WMPP\admin\EditProfile;
 use WMPP\admin\Settings;
 use WMPP\database\Repository;
@@ -69,6 +70,9 @@ class MultipleProfilePictures implements RegisterAction {
 	/** @var EditProfile */
 	protected $edit_profile;
 
+	/** @var DeleteUser */
+	protected $delete_user;
+
 	/**
 	 * Initializes attributes.
 	 *
@@ -76,15 +80,21 @@ class MultipleProfilePictures implements RegisterAction {
 	 * @param Repository $repository
 	 * @param MultiUpload $multi_upload
 	 * @param EditProfile $edit_profile
+	 * @param DeleteUser $delete_user
 	 *
-	 * @return void
 	 * @since 1.0.0
 	 */
-	public function __construct( Settings $settings, Repository $repository, MultiUpload $multi_upload, EditProfile $edit_profile ) {
+	public function __construct(
+		Settings $settings,
+		Repository $repository,
+		MultiUpload $multi_upload,
+		EditProfile $edit_profile,
+		DeleteUser $delete_user) {
 		$this->settings     = $settings;
 		$this->repository   = $repository;
 		$this->multi_upload = $multi_upload;
 		$this->edit_profile = $edit_profile;
+		$this->delete_user = $delete_user;
 	}
 
 	/**
@@ -191,6 +201,7 @@ class MultipleProfilePictures implements RegisterAction {
 		$this->settings->register();
 		$this->multi_upload->register();
 		$this->edit_profile->register();
+		$this->delete_user->register();
 	}
 
 	/**
@@ -241,13 +252,19 @@ class MultipleProfilePictures implements RegisterAction {
 	 * @param Repository $repository
 	 * @param MultiUpload $multi_upload
 	 * @param EditProfile $edit_profile
+	 * @param DeleteUser $delete_user
 	 *
 	 * @return MultipleProfilePictures
 	 * @since 1.0.0
 	 */
-	public static function instance( Settings $settings, Repository $repository, MultiUpload $multi_upload, EditProfile $edit_profile ): MultipleProfilePictures {
+	public static function instance(
+		Settings $settings,
+		Repository $repository,
+		MultiUpload $multi_upload,
+		EditProfile $edit_profile,
+		DeleteUser $delete_user): MultipleProfilePictures {
 		if ( is_null( self::$instance ) ) {
-			self::$instance = new self( $settings, $repository, $multi_upload, $edit_profile );
+			self::$instance = new self( $settings, $repository, $multi_upload, $edit_profile, $delete_user );
 		}
 
 		return self::$instance;
@@ -261,6 +278,7 @@ $my_plugin = MultipleProfilePictures::instance(
 	new Settings(),
 	$repository,
 	new MultiUpload( $repository ),
-	new EditProfile( $repository ) );
+	new EditProfile( $repository ),
+	new DeleteUser( $repository));
 $my_plugin->register();
 $my_plugin->load_plugins();

@@ -25,6 +25,20 @@ class Repository {
 	}
 
 	/**
+	 * Returns of the pictures of the given user id
+	 *
+	 * @param int $user_id
+	 *
+	 * @return array|object|null
+	 * @since 1.0.0
+	 */
+	function get_pictures_by_user_id( $user_id ) {
+		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE user_id = %d";
+
+		return $this->db->get_results( $this->db->prepare( $sql, $user_id ), ARRAY_A );
+	}
+
+	/**
 	 * Removes a picture (row) given a picture id
 	 *
 	 * @param int $mpp_user_picture_id
