@@ -39,6 +39,16 @@ class Repository {
 	}
 
 	/**
+	 * Returns all the main pictures of all the users
+	 * @return array|object|null
+	 * @since 1.0.0
+	 */
+	function get_main_profile_pictures() {
+		return $this->db->get_results( "
+		SELECT user_id, pic_name, pic_type, active FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE active = 1", ARRAY_A );
+	}
+
+	/**
 	 * Removes a picture (row) given a picture id
 	 *
 	 * @param int $mpp_user_picture_id
