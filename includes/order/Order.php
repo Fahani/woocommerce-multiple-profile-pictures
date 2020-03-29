@@ -2,6 +2,7 @@
 
 namespace WMPP\order;
 
+use WC_Order;
 use WMPP\database\Repository;
 use WMPP\helpers\Utils;
 use WMPP\interfaces\RegisterAction;
@@ -35,6 +36,7 @@ class Order implements RegisterAction {
 	 */
 	public function register() {
 		add_action( 'woocommerce_thankyou', [ $this, 'match_picture_to_order' ] );
+		add_action( 'woocommerce_admin_order_data_after_order_details', [ $this, 'insert_picture_in_order_detail' ] );
 	}
 
 	/**
@@ -55,6 +57,23 @@ class Order implements RegisterAction {
 
 			if ( copy( $source_path, $destination_path ) ) {
 				$this->repository->insert_order_picture( $order_id, $destination_name );
+			}
+		}
+	}
+
+	/**
+	 * Inserts into the Order details page, the picture the user had when he made the order
+	 *
+	 * @param WC_Order $order
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function insert_picture_in_order_detail( $order ) {
+		if ( method_exists( $order, 'get_id' ) ) {
+			$order_picture = $this->repository->get_picture_by_order_id( $order->get_id() );
+			if ( ! empty( $order_picture ) ) {
+				include( WMPP_DIR_PATH . 'templates/admin/orders/order-details-display-picture.php' );
 			}
 		}
 	}

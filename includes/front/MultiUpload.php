@@ -63,7 +63,7 @@ class MultiUpload implements RegisterAction {
 	 * @since 1.0.0
 	 */
 	public function update_profile() {
-		if ( isset ( $_POST["wmpp"] ) ) {
+		if ( isset ( $_POST['wmpp'] ) ) {
 			$this->delete_selected_pictures();
 			$this->set_main_picture();
 			$this->replace_main_picture();
@@ -78,7 +78,7 @@ class MultiUpload implements RegisterAction {
 	 * @since 1.0.0
 	 */
 	private function replace_main_picture() {
-		if ( isset( $_FILES["replace_main_picture"] ) && $_FILES["replace_main_picture"]['size'] > 0 ) {
+		if ( isset( $_FILES['replace_main_picture'] ) && $_FILES['replace_main_picture']['size'] > 0 ) {
 			$name      = $_FILES['replace_main_picture']['name'];
 			$temp_name = $_FILES['replace_main_picture']['tmp_name'];
 
@@ -170,7 +170,7 @@ class MultiUpload implements RegisterAction {
 	private function set_main_picture() {
 		if ( isset ( $_POST['main'] ) ) {
 			$pic_to_set_main = $this->repository->get_picture_by_picture_id_and_user_id(
-				$_POST["main"],
+				$_POST['main'],
 				wp_get_current_user()->ID
 			);
 			if ( empty( $pic_to_set_main ) ) {
@@ -279,7 +279,7 @@ class MultiUpload implements RegisterAction {
 			return false;
 		}
 
-		return $this->repository->insert_picture( wp_get_current_user()->ID, "$final_name", $mime, 0 );
+		return $this->repository->insert_picture( wp_get_current_user()->ID, $final_name, $mime, 0 );
 	}
 
 	/**

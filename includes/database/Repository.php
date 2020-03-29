@@ -19,7 +19,7 @@ class Repository {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	function __construct() {
+	public function __construct() {
 		global $wpdb;
 		$this->db = $wpdb;
 	}
@@ -32,7 +32,7 @@ class Repository {
 	 * @return array|object|null
 	 * @since 1.0.0
 	 */
-	function get_pictures_by_user_id( $user_id ) {
+	public function get_pictures_by_user_id( $user_id ) {
 		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE user_id = %d";
 
 		return $this->db->get_results( $this->db->prepare( $sql, $user_id ), ARRAY_A );
@@ -43,7 +43,7 @@ class Repository {
 	 * @return array|object|null
 	 * @since 1.0.0
 	 */
-	function get_main_profile_pictures() {
+	public function get_main_profile_pictures() {
 		return $this->db->get_results( "
 		SELECT user_id, pic_name, pic_type, active FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE active = 1", ARRAY_A );
 	}
@@ -56,7 +56,7 @@ class Repository {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	function delete_picture_by_picture_id( $mpp_user_picture_id ) {
+	public function delete_picture_by_picture_id( $mpp_user_picture_id ) {
 		$sql = "DELETE FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE mpp_user_picture_id = %d";
 
 		$this->db->query( $this->db->prepare( $sql, $mpp_user_picture_id ) );
@@ -71,7 +71,7 @@ class Repository {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	function insert_order_picture( $order_id, $pic_name ) {
+	public function insert_order_picture( $order_id, $pic_name ) {
 		$sql = "INSERT INTO `{$this->db->prefix}woocommerce_mpp_order_picture` (order_id, pic_name) VALUES (%d, %s)";
 
 		$this->db->query( $this->db->prepare( $sql, $order_id, $pic_name ) );
@@ -86,7 +86,7 @@ class Repository {
 	 * @since 1.0.0
 	 *
 	 */
-	function get_no_main_pictures_by_user_id( $user_id ) {
+	public function get_no_main_pictures_by_user_id( $user_id ) {
 		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE active = 0 and user_id = %d";
 
 		return $this->db->get_results( $this->db->prepare( $sql, $user_id ), ARRAY_A );
@@ -99,7 +99,7 @@ class Repository {
 	 *
 	 * @return array|object|null
 	 */
-	function get_picture_by_order_id( $order_id ) {
+	public function get_picture_by_order_id( $order_id ) {
 		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_order_picture` WHERE order_id = %d";
 
 		return $this->db->get_results( $this->db->prepare( $sql, $order_id ), ARRAY_A );
@@ -114,7 +114,7 @@ class Repository {
 	 * @since 1.0.0
 	 *
 	 */
-	function get_main_picture_by_user_id( $user_id ) {
+	public function get_main_picture_by_user_id( $user_id ) {
 		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE active = 1 and user_id = %d";
 
 		return $this->db->get_results( $this->db->prepare( $sql, $user_id ), ARRAY_A );
@@ -129,7 +129,7 @@ class Repository {
 	 * @return array|object|null
 	 * @since 1.0.0
 	 */
-	function get_picture_by_picture_id_and_user_id( $mpp_user_picture_id, $user_id ) {
+	public function get_picture_by_picture_id_and_user_id( $mpp_user_picture_id, $user_id ) {
 		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE mpp_user_picture_id = %d and user_id = %d";
 
 		return $this->db->get_results( $this->db->prepare( $sql, $mpp_user_picture_id, $user_id ), ARRAY_A );
@@ -143,7 +143,7 @@ class Repository {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	function unset_main_picture_by_user_id( $user_id ) {
+	public function unset_main_picture_by_user_id( $user_id ) {
 		$sql = "UPDATE `{$this->db->prefix}woocommerce_mpp_user_picture` SET active=0 WHERE active=1 and user_id = %d";
 
 		$this->db->query( $this->db->prepare( $sql, $user_id ) );
@@ -157,7 +157,7 @@ class Repository {
 	 * @return void
 	 * @since 1.0.0
 	 */
-	function set_main_picture_by_picture_id( $mpp_user_picture_id ) {
+	public function set_main_picture_by_picture_id( $mpp_user_picture_id ) {
 		$sql = "UPDATE `{$this->db->prefix}woocommerce_mpp_user_picture` SET active=1 WHERE mpp_user_picture_id = %d";
 
 		$this->db->query( $this->db->prepare( $sql, $mpp_user_picture_id ) );
@@ -172,7 +172,7 @@ class Repository {
 	 * @return int
 	 * @since 1.0.0
 	 */
-	function get_number_pics_by_user( $user_id ) {
+	public function get_number_pics_by_user( $user_id ) {
 		$sql = "SELECT COUNT(*) AS number FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE user_id = %d";
 
 		return (int) $this->db->get_results( $this->db->prepare( $sql, $user_id ), ARRAY_A )[0]['number'];
@@ -189,7 +189,7 @@ class Repository {
 	 * @return int
 	 * @since 1.0.0
 	 */
-	function insert_picture( $user_id, $name, $type, $active ) {
+	public function insert_picture( $user_id, $name, $type, $active ) {
 		$sql = "INSERT INTO `{$this->db->prefix}woocommerce_mpp_user_picture` (user_id, pic_name, pic_type, active) 
 		VALUES (%d, %s, %s, %d)";
 		$this->db->query( $this->db->prepare( $sql, $user_id, $name, $type, $active ) );
