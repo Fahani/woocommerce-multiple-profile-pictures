@@ -43,10 +43,30 @@ class MultipleProfilePictures {
 
 	}
 
+
+	/**
+	 * Cloning instances is forbidden due to singleton pattern.
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function __clone() {
+		_doing_it_wrong( __FUNCTION__, sprintf( 'You cannot clone instances of %s.', get_class( $this ) ), '1.0.0' );
+	}
+
+
+	/**
+	 * Unserializing instances is forbidden due to singleton pattern.
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function __wakeup() {
+		_doing_it_wrong( __FUNCTION__, sprintf( 'You cannot unserialize instances of %s.', get_class( $this ) ), '1.0.0' );
+	}
+
 	/**
 	 * Ensures only one instance is set.
-	 * @since 1.0.0
 	 * @return MultipleProfilePictures
+	 * @since 1.0.0
 	 */
 	public static function instance(): MultipleProfilePictures {
 		if ( is_null( self::$instance ) ) {
