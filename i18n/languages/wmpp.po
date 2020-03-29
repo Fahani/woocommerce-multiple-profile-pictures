@@ -1,0 +1,161 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wmpp\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.3\n"
+"X-Poedit-Basepath: ../..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: includes/API/Api.php:73
+msgid "To access this endpoint, you need to be logged in"
+msgstr ""
+
+#: includes/admin/Settings.php:36 includes/admin/Settings.php:86
+msgid "Settings"
+msgstr ""
+
+#: includes/admin/Settings.php:51
+msgid "WMPP Settings"
+msgstr ""
+
+#: includes/admin/Settings.php:91
+msgid "Max number of profile pictures"
+msgstr ""
+
+#: includes/front/MultiUpload.php:89
+#, php-format
+msgid "There was an error uploading your picture %s"
+msgstr ""
+
+#: includes/front/MultiUpload.php:97 includes/front/MultiUpload.php:101
+msgid "Profile picture replaced"
+msgstr ""
+
+#: includes/front/MultiUpload.php:105 includes/front/MultiUpload.php:140
+#, php-format
+msgid "There was an error deleting the picture id(%s)"
+msgstr ""
+
+#: includes/front/MultiUpload.php:130
+#, php-format
+msgid "You can not delete this picture, id(%s)"
+msgstr ""
+
+#: includes/front/MultiUpload.php:148
+#, php-format
+msgid "Picture deleted id(%s)"
+msgstr ""
+
+#: includes/front/MultiUpload.php:179
+#, php-format
+msgid "The picture id(%s) can not be set as main picture, it does not exist"
+msgstr ""
+
+#: includes/front/MultiUpload.php:189
+#, php-format
+msgid "Picture id(%s) set as your main picture."
+msgstr ""
+
+#: includes/front/MultiUpload.php:217
+#, php-format
+msgid ""
+"You have reached the maximum number of pictures you can upload (%s). %s will "
+"not be uploaded"
+msgstr ""
+
+#: includes/front/MultiUpload.php:230
+#, php-format
+msgid "Your picture %s has been uploaded"
+msgstr ""
+
+#: includes/front/MultiUpload.php:248
+#, php-format
+msgid "Invalid image format, please try one of these formats: %s"
+msgstr ""
+
+#: includes/order/Order.php:100
+msgid "Profile"
+msgstr ""
+
+#: templates/admin/error-woocommerce-not-found.php:3
+#, php-format
+msgid "WooCommerce is not active. Please activate it to enable this plugin %s."
+msgstr ""
+
+#: templates/admin/orders/order-details-display-picture.php:7
+#: templates/admin/orders/order-details-display-picture.php:8
+#: templates/admin/orders/order-preview-display-small-picture.php:6
+msgid "Main profile picture"
+msgstr ""
+
+#: templates/admin/settings-input.php:2
+msgid "Set to -1 for unlimited pictures"
+msgstr ""
+
+#: templates/admin/users/edit-profile-display-user-pictures.php:11
+msgid "Main Customer Picture"
+msgstr ""
+
+#: templates/admin/users/edit-profile-display-user-pictures.php:23
+msgid "Customer's other pictures"
+msgstr ""
+
+#: templates/myaccount/add-picture-selection-to-form.php:11
+#: templates/myaccount/add-picture-selection-to-form.php:12
+msgid "Your default picture"
+msgstr ""
+
+#: templates/myaccount/add-picture-selection-to-form.php:15
+#: templates/myaccount/add-picture-selection-to-form.php:16
+msgid "Your main profile picture"
+msgstr ""
+
+#: templates/myaccount/add-picture-selection-to-form.php:19
+#: templates/myaccount/add-picture-selection-to-form.php:50
+msgid "Delete"
+msgstr ""
+
+#: templates/myaccount/add-picture-selection-to-form.php:22
+msgid ""
+"Do you want to replace the main picture? You can upload the replacement here"
+msgstr ""
+
+#: templates/myaccount/add-picture-selection-to-form.php:30
+msgid "You can upload multiple pictures at once here"
+msgstr ""
+
+#: templates/myaccount/add-picture-selection-to-form.php:39
+msgid "Your available profile pictures"
+msgstr ""
+
+#: templates/myaccount/add-picture-selection-to-form.php:45
+msgid "Set as main"
+msgstr ""
+
+#: templates/myaccount/add-picture-selection-to-form.php:60
+msgid "Click \"Save changes\" to apply changes"
+msgstr ""
+
+#: woocommerce-multiple-profile-pictures.php:189
+#, php-format
+msgid ""
+"%1$s could not be activated. The minimum %2$s version required for this "
+"plugin is %3$s. You are running %4$s."
+msgstr ""
+
+#: woocommerce-multiple-profile-pictures.php:252
+#, php-format
+msgid "You cannot clone instances of %s."
+msgstr ""
+
+#: woocommerce-multiple-profile-pictures.php:262
+#, php-format
+msgid "You cannot unserialize instances of %s."
+msgstr ""

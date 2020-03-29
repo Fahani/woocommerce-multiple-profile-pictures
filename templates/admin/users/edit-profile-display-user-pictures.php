@@ -20,7 +20,7 @@
         </td>
     </tr>
     <tr>
-        <th><?php _e( 'Others customers pictures', 'wmpp' ) ?></th>
+        <th><?php _e( 'Customer\'s other pictures', 'wmpp' ) ?></th>
         <td>
 			<?php foreach ( $rest_pictures as $picture ) { ?>
                 <div class="inline-block">

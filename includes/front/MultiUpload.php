@@ -94,11 +94,11 @@ class MultiUpload implements RegisterAction {
 
 				if ( empty( $main_picture ) ) {
 					$this->repository->set_main_picture_by_picture_id( $picture_id );
-					wc_add_notice( __( 'Profile replaced', 'wmpp' ), 'success' );
+					wc_add_notice( __( 'Profile picture replaced', 'wmpp' ), 'success' );
 				} elseif ( $this->delete_from_uploads( $main_picture[0]['pic_name'] ) ) {
 					$this->repository->delete_picture_by_picture_id( $main_picture[0]['mpp_user_picture_id'] );
 					$this->repository->set_main_picture_by_picture_id( $picture_id );
-					wc_add_notice( __( 'Profile replaced', 'wmpp' ), 'success' );
+					wc_add_notice( __( 'Profile picture replaced', 'wmpp' ), 'success' );
 				} else {
 					wc_add_notice(
 						sprintf(
@@ -127,7 +127,7 @@ class MultiUpload implements RegisterAction {
 				if ( empty( $pic_to_remove ) ) {
 					wc_add_notice(
 						sprintf(
-							__( 'You can not delete a picture with id(%s)', 'wmpp' ),
+							__( 'You can not delete this picture, id(%s)', 'wmpp' ),
 							$pic_id
 						),
 						'error' );
@@ -214,7 +214,7 @@ class MultiUpload implements RegisterAction {
 				if ( $num_max_pics != - 1 && $num_pics_user >= $num_max_pics ) {
 					wc_add_notice(
 						sprintf(
-							__( 'You have reached the maximum of pics you can upload (%s). %s will not be uploaded', 'wmpp' ),
+							__( 'You have reached the maximum number of pictures you can upload (%s). %s will not be uploaded', 'wmpp' ),
 							$num_max_pics, $name
 						)
 						, 'error' );

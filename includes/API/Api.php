@@ -70,7 +70,7 @@ class Api implements RegisterAction {
 	 */
 	public function deny_if_logout( $params ) {
 		if ( strpos( $_SERVER['REQUEST_URI'], 'wc/v1/profiles' ) !== false && ! is_user_logged_in() ) {
-			return new WP_Error( 'logout', __( 'To access this endpoint you need to be logged in', 'wmpp' ) );
+			return new WP_Error( 'logout', __( 'To access this endpoint, you need to be logged in', 'wmpp' ) );
 		}
 
 		return $params;

@@ -16,7 +16,7 @@
         <img class="border-1px " alt="<?php _e( 'Your main profile picture', 'wmpp' ) ?>"
              src="<?php echo wp_upload_dir()['baseurl'] . "/wmpp/users/{$main_picture[0]['pic_name']}" ?>">
         <small class="block">ID: <?php echo $main_picture[0]['mpp_user_picture_id'] ?></small>
-        <label><?php _e( 'To delete', 'wmpp' ) ?></label>
+        <label><?php _e( 'Delete', 'wmpp' ) ?></label>
         <input type="checkbox" name="remove[]" value="<?php echo $main_picture[0]['mpp_user_picture_id'] ?>">
         <br><br>
         <span><?php _e( 'Do you want to replace the main picture? You can upload the replacement here', 'wmpp' ) ?></span><br>
@@ -27,7 +27,7 @@
 <?php if ( $num_max_pics == - 1 || $num_pics_user < $num_max_pics ) { ?>
     <br>
     <div class="border-1px padding-05-em">
-        <span><?php _e( 'You can multiple pictures at once here', 'wmpp' ) ?></span>
+        <span><?php _e( 'You can upload multiple pictures at once here', 'wmpp' ) ?></span>
         <br>
         <input type="file" name="profile_pictures[]" multiple="multiple">
     </div>
@@ -47,7 +47,7 @@
             <img class="border-1px inline-block"
                  src="<?php echo wp_upload_dir()['baseurl'] . "/wmpp/users/{$picture['pic_name']}" ?>">
             <small class="block negative-top-margin-10px">ID: <?php echo $picture['mpp_user_picture_id'] ?></small>
-            <label><?php _e( 'To delete', 'wmpp' ) ?></label>
+            <label><?php _e( 'Delete', 'wmpp' ) ?></label>
             <input type="checkbox" name="remove[]" value="<?php echo $picture['mpp_user_picture_id'] ?>">
         </div>
 	<?php } ?>
@@ -57,4 +57,4 @@
 
 <br><br>
 <input type="hidden" name="wmpp">
-<strong><?php _e( 'Remember to save the form to apply changes', 'wmpp' ) ?></strong>
+<strong><?php _e( 'Click "Save changes" to apply changes', 'wmpp' ) ?></strong>
