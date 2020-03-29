@@ -1,0 +1,19 @@
+{
+    "name": "nico/woocommerce-multiple-profile-pictures",
+    "description": "Plugin to manage multiple profile pictures and select the active one to get discounts",
+    "type": "project",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Nico",
+            "email": "nicolas@unex.es"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "WMPP\\": "includes/"
+        }
+    }
+}
