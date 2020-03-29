@@ -17,6 +17,10 @@
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
 
+if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
+	require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+}
+
 define( 'WMPP_BASENAME', plugin_basename( __FILE__ ) );
 
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
