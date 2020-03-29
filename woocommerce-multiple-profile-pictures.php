@@ -9,11 +9,17 @@
  * Author URI: https://github.com/Fahani
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
+ * Text Domain: wmpp
+ * Domain Path: /i18n/languages/
  * @package WC-Multiple-Profile-Pictures
  *
  */
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
+
+define( 'WMPP_BASENAME', plugin_basename( __FILE__ ) );
+
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 /**
  * Plugin main class
@@ -43,6 +49,25 @@ class MultipleProfilePictures {
 
 	}
 
+	/**
+	 * Loads all necessary actions after the plugin has been activated
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function load_plugins() {
+		if ( is_plugin_active( WMPP_BASENAME ) ) {
+			add_action( 'init', array( $this, 'load_translation' ) );
+		}
+	}
+
+	/**
+	 * Loads the mo file for your translations
+	 * @return void
+	 * @since 1.0.1
+	 */
+	public function load_translation() {
+		load_plugin_textdomain( 'wmpp', false, dirname( WMPP_BASENAME ) . '/i18n/languages' );
+	}
 
 	/**
 	 * Cloning instances is forbidden due to singleton pattern.
@@ -50,7 +75,7 @@ class MultipleProfilePictures {
 	 * @since 1.0.0
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, sprintf( 'You cannot clone instances of %s.', get_class( $this ) ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, sprintf( __( 'You cannot clone instances of %s.', 'wmpp' ), get_class( $this ) ), '1.0.0' );
 	}
 
 
@@ -60,7 +85,7 @@ class MultipleProfilePictures {
 	 * @since 1.0.0
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, sprintf( 'You cannot unserialize instances of %s.', get_class( $this ) ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, sprintf( __( 'You cannot unserialize instances of %s.', 'wmpp' ), get_class( $this ) ), '1.0.0' );
 	}
 
 	/**
@@ -79,3 +104,4 @@ class MultipleProfilePictures {
 
 // Fire it up! :)
 $myPlugin = MultipleProfilePictures::instance();
+$myPlugin->load_plugins();
