@@ -15,6 +15,7 @@
  *
  */
 
+use WMPP\admin\EditProfile;
 use WMPP\admin\Settings;
 use WMPP\database\Repository;
 use WMPP\front\MultiUpload;
@@ -65,10 +66,25 @@ class MultipleProfilePictures implements RegisterAction {
 	/** @var MultiUpload */
 	protected $multi_upload;
 
-	public function __construct( Settings $settings, Repository $repository, MultiUpload $multi_upload ) {
+	/** @var EditProfile */
+	protected $edit_profile;
+
+	/**
+	 * Initializes attributes.
+	 *
+	 * @param Settings $settings
+	 * @param Repository $repository
+	 * @param MultiUpload $multi_upload
+	 * @param EditProfile $edit_profile
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function __construct( Settings $settings, Repository $repository, MultiUpload $multi_upload, EditProfile $edit_profile ) {
 		$this->settings     = $settings;
 		$this->repository   = $repository;
 		$this->multi_upload = $multi_upload;
+		$this->edit_profile = $edit_profile;
 	}
 
 	/**
@@ -153,7 +169,6 @@ class MultipleProfilePictures implements RegisterAction {
 		);
 	}
 
-
 	/**
 	 * Loads all necessary actions after the plugin has been activated
 	 * @return void
@@ -175,6 +190,7 @@ class MultipleProfilePictures implements RegisterAction {
 	public function load_plugin_dependencies() {
 		$this->settings->register();
 		$this->multi_upload->register();
+		$this->edit_profile->register();
 	}
 
 	/**
@@ -224,21 +240,27 @@ class MultipleProfilePictures implements RegisterAction {
 	 * @param Settings $settings
 	 * @param Repository $repository
 	 * @param MultiUpload $multi_upload
+	 * @param EditProfile $edit_profile
 	 *
 	 * @return MultipleProfilePictures
 	 * @since 1.0.0
 	 */
-	public static function instance( Settings $settings, Repository $repository, MultiUpload $multi_upload ): MultipleProfilePictures {
+	public static function instance( Settings $settings, Repository $repository, MultiUpload $multi_upload, EditProfile $edit_profile ): MultipleProfilePictures {
 		if ( is_null( self::$instance ) ) {
-			self::$instance = new self( $settings, $repository, $multi_upload );
+			self::$instance = new self( $settings, $repository, $multi_upload, $edit_profile );
 		}
 
 		return self::$instance;
 	}
 }
+
 $repository = new Repository();
 
 // Fire it up! :)
-$my_plugin = MultipleProfilePictures::instance( new Settings(),$repository , new MultiUpload($repository) );
+$my_plugin = MultipleProfilePictures::instance(
+	new Settings(),
+	$repository,
+	new MultiUpload( $repository ),
+	new EditProfile( $repository ) );
 $my_plugin->register();
 $my_plugin->load_plugins();
