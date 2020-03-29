@@ -22,6 +22,7 @@ use WMPP\API\Api;
 use WMPP\database\Repository;
 use WMPP\front\MultiUpload;
 use WMPP\interfaces\RegisterAction;
+use WMPP\order\Order;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
 
@@ -77,6 +78,9 @@ class MultipleProfilePictures implements RegisterAction {
 	/** @var Api */
 	protected $api;
 
+	/** @var Order  */
+	protected $order;
+
 	/**
 	 * Initializes attributes.
 	 *
@@ -85,8 +89,8 @@ class MultipleProfilePictures implements RegisterAction {
 	 * @param MultiUpload $multi_upload
 	 * @param EditProfile $edit_profile
 	 * @param DeleteUser $delete_user
-	 *
 	 * @param Api $api
+	 * @param Order $order
 	 *
 	 * @since 1.0.0
 	 */
@@ -96,7 +100,8 @@ class MultipleProfilePictures implements RegisterAction {
 		MultiUpload $multi_upload,
 		EditProfile $edit_profile,
 		DeleteUser $delete_user,
-		Api $api
+		Api $api,
+		Order $order
 	) {
 		$this->settings     = $settings;
 		$this->repository   = $repository;
@@ -104,6 +109,7 @@ class MultipleProfilePictures implements RegisterAction {
 		$this->edit_profile = $edit_profile;
 		$this->delete_user  = $delete_user;
 		$this->api          = $api;
+		$this->order        = $order;
 	}
 
 	/**
@@ -212,6 +218,7 @@ class MultipleProfilePictures implements RegisterAction {
 		$this->edit_profile->register();
 		$this->delete_user->register();
 		$this->api->register();
+		$this->order->register();
 	}
 
 	/**
@@ -264,6 +271,7 @@ class MultipleProfilePictures implements RegisterAction {
 	 * @param EditProfile $edit_profile
 	 * @param DeleteUser $delete_user
 	 * @param Api $api
+	 * @param Order $order
 	 *
 	 * @return MultipleProfilePictures
 	 * @since 1.0.0
@@ -274,10 +282,11 @@ class MultipleProfilePictures implements RegisterAction {
 		MultiUpload $multi_upload,
 		EditProfile $edit_profile,
 		DeleteUser $delete_user,
-		Api $api
+		Api $api,
+		Order $order
 	): MultipleProfilePictures {
 		if ( is_null( self::$instance ) ) {
-			self::$instance = new self( $settings, $repository, $multi_upload, $edit_profile, $delete_user, $api );
+			self::$instance = new self( $settings, $repository, $multi_upload, $edit_profile, $delete_user, $api, $order );
 		}
 
 		return self::$instance;
@@ -293,6 +302,7 @@ $my_plugin = MultipleProfilePictures::instance(
 	new MultiUpload( $repository ),
 	new EditProfile( $repository ),
 	new DeleteUser( $repository ),
-	new Api( $repository ) );
+	new Api( $repository ),
+	new Order( $repository ) );
 $my_plugin->register();
 $my_plugin->load_plugins();

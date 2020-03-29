@@ -63,6 +63,21 @@ class Repository {
 	}
 
 	/**
+	 * Inserts a new picture name and order id
+	 *
+	 * @param int $order_id
+	 * @param string $pic_name
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	function insert_order_picture( $order_id, $pic_name ) {
+		$sql = "INSERT INTO `{$this->db->prefix}woocommerce_mpp_order_picture` (order_id, pic_name) VALUES (%d, %s)";
+
+		$this->db->query( $this->db->prepare( $sql, $order_id, $pic_name ) );
+	}
+
+	/**
 	 * Returns, given an user id, all the pictures of an user that aren't his main picture.
 	 *
 	 * @param int $user_id
@@ -75,6 +90,19 @@ class Repository {
 		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_user_picture` WHERE active = 0 and user_id = %d";
 
 		return $this->db->get_results( $this->db->prepare( $sql, $user_id ), ARRAY_A );
+	}
+
+	/**
+	 * It returns the picture related to a given order id
+	 *
+	 * @param $order_id
+	 *
+	 * @return array|object|null
+	 */
+	function get_picture_by_order_id( $order_id ) {
+		$sql = "SELECT * FROM `{$this->db->prefix}woocommerce_mpp_order_picture` WHERE order_id = %d";
+
+		return $this->db->get_results( $this->db->prepare( $sql, $order_id ), ARRAY_A );
 	}
 
 	/**
