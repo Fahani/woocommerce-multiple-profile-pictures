@@ -25,6 +25,16 @@ class Repository {
 	}
 
 	/**
+	 * It drops the table created by the plugin
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function delete_tables() {
+		$this->db->query( "DROP TABLE `{$this->db->prefix}woocommerce_mpp_user_picture`" );
+		$this->db->query( "DROP TABLE `{$this->db->prefix}woocommerce_mpp_order_picture`" );
+	}
+
+	/**
 	 * Removes a row (picture) by order id
 	 *
 	 * @param int $order_id
