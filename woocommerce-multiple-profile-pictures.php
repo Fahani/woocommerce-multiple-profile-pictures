@@ -50,12 +50,10 @@ class MultipleProfilePictures implements RegisterAction {
 	const MINIMUM_PHP_VERSION = '7.1.0';
 
 	/** minimum WooCommerce version required by this plugin */
-	//TODO Checks real requirements at the end
 	const MINIMUM_WC_VERSION = '3.0.9';
 
 	/** minimum WordPress version required by this plugin */
-	//TODO Checks real requirements at the end
-	const MINIMUM_WP_VERSION = '4.4';
+	const MINIMUM_WP_VERSION = '4.7.1';
 
 	/** @var MultipleProfilePictures */
 	protected static $instance;
