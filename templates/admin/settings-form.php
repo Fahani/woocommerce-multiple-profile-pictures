@@ -1,5 +1,5 @@
 <div class="wrap">
-    <h1><?php echo MultipleProfilePictures::PLUGIN_NAME ?></h1>
+    <h1><?php echo \WMPP\base\Activate::PLUGIN_NAME ?></h1>
 	<?php settings_errors(); ?>
 
     <form method="post" action="options.php">

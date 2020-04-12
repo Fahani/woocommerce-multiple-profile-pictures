@@ -21,7 +21,6 @@ use WMPP\admin\Settings;
 use WMPP\API\Api;
 use WMPP\database\Repository;
 use WMPP\front\MultiUpload;
-use WMPP\interfaces\RegisterAction;
 use WMPP\order\Order;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
@@ -41,19 +40,8 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
  *
  * @since 1.0.0
  */
-class MultipleProfilePictures implements RegisterAction {
+class MultipleProfilePictures {
 
-	/** the plugin name, for displaying notices */
-	const PLUGIN_NAME = 'WooCommerce Multiple Profile Pictures';
-
-	/** minimum PHP version required by this plugin */
-	const MINIMUM_PHP_VERSION = '7.1.0';
-
-	/** minimum WooCommerce version required by this plugin */
-	const MINIMUM_WC_VERSION = '3.0.9';
-
-	/** minimum WordPress version required by this plugin */
-	const MINIMUM_WP_VERSION = '4.7.1';
 
 	/** @var MultipleProfilePictures */
 	protected static $instance;
@@ -76,7 +64,7 @@ class MultipleProfilePictures implements RegisterAction {
 	/** @var Api */
 	protected $api;
 
-	/** @var Order  */
+	/** @var Order */
 	protected $order;
 
 	/**
@@ -110,87 +98,6 @@ class MultipleProfilePictures implements RegisterAction {
 		$this->order        = $order;
 	}
 
-	/**
-	 * Registers all the one time actions needed for this plugin to work
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function register() {
-		register_activation_hook( __FILE__, [ $this, 'activation_check' ] );
-		register_activation_hook( __FILE__, [ $this, 'create_database' ] );
-		register_activation_hook( __FILE__, [ $this, 'create_directories' ] );
-	}
-
-
-	/**
-	 * Checks the server environment and other factors and deactivates plugins as necessary.
-	 *
-	 * Based on http://wptavern.com/how-to-prevent-wordpress-plugins-from-activating-on-sites-with-incompatible-hosting-environments
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function activation_check() {
-		if ( ! version_compare( PHP_VERSION, self::MINIMUM_PHP_VERSION, '>=' ) ) {
-			$this->deactivate_and_die( self::PLUGIN_NAME, 'PHP', self::MINIMUM_PHP_VERSION, PHP_VERSION );
-		}
-
-		if ( ! version_compare( get_bloginfo( 'version' ), self::MINIMUM_WP_VERSION, '>=' ) ) {
-			$this->deactivate_and_die( self::PLUGIN_NAME, 'WordPress', self::MINIMUM_WP_VERSION, get_bloginfo( 'version' ) );
-		}
-
-		if ( ! ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, self::MINIMUM_WC_VERSION, '>=' ) ) ) {
-			$this->deactivate_and_die( self::PLUGIN_NAME, 'WooCommerce', self::MINIMUM_WC_VERSION, defined( 'WC_VERSION' ) ? WC_VERSION : '0' );
-		}
-	}
-
-	/**
-	 * Creates the structure of folders inside uploads. Where the pictures for users and orders will be stored.
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function create_directories() {
-		if ( ! is_dir( wp_upload_dir()['basedir'] . '/wmpp' ) ) {
-			mkdir( wp_upload_dir()['basedir'] . '/wmpp', 0755 );
-		}
-		if ( ! is_dir( wp_upload_dir()['basedir'] . '/wmpp/users' ) ) {
-			mkdir( wp_upload_dir()['basedir'] . '/wmpp/users', 0755 );
-		}
-		if ( ! is_dir( wp_upload_dir()['basedir'] . '/wmpp/orders' ) ) {
-			mkdir( wp_upload_dir()['basedir'] . '/wmpp/orders', 0755 );
-		}
-	}
-
-	/**
-	 * Creates the needed tables for this plugin
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function create_database() {
-		$this->repository->create_tables();
-	}
-
-	/**
-	 * Deactivates the plugin and shows an informative message with the missing requirement
-	 *
-	 * @param string $plugin_name Name of the plugin
-	 * @param string $requirement The requirement
-	 * @param string $version_needed Minimum version needed
-	 * @param string $current_version Current version
-	 *
-	 * @return void
-	 * @since 1.0.0
-	 */
-	protected function deactivate_and_die( $plugin_name, $requirement, $version_needed, $current_version ) {
-		deactivate_plugins( WMPP_BASENAME );
-
-		wp_die( sprintf(
-				__( '%1$s could not be activated. The minimum %2$s version required for this plugin is %3$s. You are running %4$s.', 'wmpp' ),
-				$plugin_name,
-				$requirement,
-				$version_needed,
-				$current_version )
-		);
-	}
 
 	/**
 	 * Loads all necessary actions after the plugin has been activated
@@ -291,6 +198,20 @@ class MultipleProfilePictures implements RegisterAction {
 	}
 }
 
+/**
+ * Triggers the actions during plugin activation
+ *
+ * @return void
+ * @since 1.0.0
+ */
+function activate_wmpp_plugin() {
+	$activate = new \WMPP\base\Activate( new \WMPP\database\ActivationRepository() );
+	$activate->activate();
+
+}
+
+register_activation_hook( __FILE__, 'activate_wmpp_plugin' );
+
 $repository = new Repository();
 
 // Fire it up! :)
@@ -302,5 +223,5 @@ $my_plugin = MultipleProfilePictures::instance(
 	new DeleteUser( $repository ),
 	new Api( $repository ),
 	new Order( $repository ) );
-$my_plugin->register();
+
 $my_plugin->load_plugins();

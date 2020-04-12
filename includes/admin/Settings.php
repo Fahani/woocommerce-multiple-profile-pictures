@@ -2,7 +2,7 @@
 
 namespace WMPP\admin;
 
-use MultipleProfilePictures;
+use WMPP\base\Activate;
 use WMPP\interfaces\RegisterAction;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
@@ -39,7 +39,6 @@ class Settings implements RegisterAction {
 		return $links;
 	}
 
-
 	/**
 	 * It adds a new section into the admin menu that goes to the plugin's settings page
 	 * @return void
@@ -47,7 +46,7 @@ class Settings implements RegisterAction {
 	 */
 	public function add_settings_menu() {
 		add_menu_page(
-			MultipleProfilePictures::PLUGIN_NAME,
+			Activate::PLUGIN_NAME,
 			__( 'WMPP Settings', 'wmpp' ),
 			'manage_options',
 			'wmpp_settings',
