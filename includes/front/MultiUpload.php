@@ -37,11 +37,20 @@ class MultiUpload implements RegisterAction {
 	}
 
 	/**
-	 * Registers the actions to insert the picture inside the Account details form
+	 * Triggers the registration of actions and filters when all the plugins are loaded.
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public function register() {
+		add_action( 'plugins_loaded', [ $this, 'register_actions_filters' ] );
+	}
+
+	/**
+	 * Registers the actions and filters related to insert the picture inside the Account details form
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function register_actions_filters() {
 		add_action( 'template_redirect', [ $this, 'update_profile' ], 5 );
 		add_action( 'woocommerce_before_edit_account_form', [ $this, 'enqueue_assets' ] );
 		add_action( 'woocommerce_edit_account_form_tag', [ $this, 'add_multipart_to_form' ] );

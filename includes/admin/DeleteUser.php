@@ -30,11 +30,20 @@ class DeleteUser implements RegisterAction {
 	}
 
 	/**
-	 * Registers the action of deleting an user
+	 * Triggers the registration of actions and filters when all the plugins are loaded.
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public function register() {
+		add_action( 'plugins_loaded', [ $this, 'register_actions_filters' ] );
+	}
+
+	/**
+	 * Registers the action needed to display info under Edit Profile page
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function register_actions_filters() {
 		add_action( 'delete_user', [ $this, 'delete_user_info' ], 10, 1 );
 	}
 

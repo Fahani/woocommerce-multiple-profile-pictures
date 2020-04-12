@@ -14,11 +14,20 @@ defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
 class Settings implements RegisterAction {
 
 	/**
-	 * Registers the needed actions and filters to set up the Settings page.
+	 * Triggers the registration of actions and filters when all the plugins are loaded.
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public function register() {
+		add_action( 'plugins_loaded', [ $this, 'register_actions_filters' ] );
+	}
+
+	/**
+	 * Registers the actions and filters related to the Settings
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function register_actions_filters() {
 		add_filter( 'plugin_action_links_' . WMPP_BASENAME, [ $this, 'add_settings_link' ] );
 		add_action( 'admin_menu', [ $this, 'add_settings_menu' ] );
 		add_action( 'admin_init', [ $this, 'register_custom_fields' ] );
@@ -91,7 +100,6 @@ class Settings implements RegisterAction {
 			[ $this, 'add_input_information' ],
 			'wmpp_settings',
 			'wmpp_settings_section' );
-
 	}
 
 	/**

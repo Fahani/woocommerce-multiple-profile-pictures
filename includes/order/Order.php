@@ -30,11 +30,20 @@ class Order implements RegisterAction {
 	}
 
 	/**
-	 * Registers the different hooks to interact with the order
+	 * Triggers the registration of actions and filters when all the plugins are loaded.
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public function register() {
+		add_action( 'plugins_loaded', [ $this, 'register_actions_filters' ] );
+	}
+
+	/**
+	 * It registers the actions to interact with the order
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function register_actions_filters() {
 		add_action( 'woocommerce_thankyou', [ $this, 'match_picture_to_order' ] );
 		add_action( 'woocommerce_admin_order_data_after_order_details', [ $this, 'insert_picture_in_order_detail' ] );
 		add_filter( 'manage_edit-shop_order_columns', [ $this, 'insert_new_picture_column' ] );

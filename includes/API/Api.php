@@ -29,11 +29,20 @@ class Api implements RegisterAction {
 	}
 
 	/**
-	 * It registers the actions to create a new endpoint and deny the access if the user is not logged in
+	 * Triggers the registration of actions and filters when all the plugins are loaded.
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public function register() {
+		add_action( 'plugins_loaded', [ $this, 'register_actions_filters' ] );
+	}
+
+	/**
+	 * It registers the actions to create a new endpoint and deny the access if the user is not logged in
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function register_actions_filters() {
 		add_action( 'rest_api_init', [ $this, 'register_endpoint' ] );
 		add_filter( 'rest_authentication_errors', [ $this, 'deny_if_logout' ] );
 	}

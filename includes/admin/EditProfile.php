@@ -30,11 +30,20 @@ class EditProfile implements RegisterAction {
 	}
 
 	/**
-	 * Register the action needed to display info under Edit Profile page
+	 * Triggers the registration of actions and filters when all the plugins are loaded.
 	 * @return void
 	 * @since 1.0.0
 	 */
 	public function register() {
+		add_action( 'plugins_loaded', [ $this, 'register_actions_filters' ] );
+	}
+
+	/**
+	 * Registers the action needed to display info under Edit Profile page
+	 * @return void
+	 * @since 1.0.0
+	 */
+	public function register_actions_filters() {
 		add_action( 'edit_user_profile', [ $this, 'add_picture_info' ], 10, 1 );
 	}
 
