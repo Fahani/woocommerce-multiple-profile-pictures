@@ -47,6 +47,8 @@ class Activate {
 		$this->activation_check();
 		$this->activation_repository->create_tables();
 		$this->create_directories();
+
+		$this->allow_customer_upload();
 	}
 
 	/**
@@ -110,4 +112,16 @@ class Activate {
 		}
 	}
 
+	/**
+	 * Add the capability to upload files to contributor role
+	 * @return void
+	 * @since 1.0.0
+	 */
+	private function allow_customer_upload() {
+		$customer = get_role( 'customer' );
+		if ( $customer ) {
+			$customer->add_cap('upload_files');
+			$customer->add_cap('delete_posts');
+		}
+	}
 }
