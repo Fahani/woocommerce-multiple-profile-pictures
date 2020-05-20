@@ -2,7 +2,6 @@
 
 namespace WMPP\admin;
 
-use WMPP\database\Repository;
 use WMPP\interfaces\RegisterAction;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
@@ -14,20 +13,6 @@ defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
  * @package WMPP\admin
  */
 class EditProfile implements RegisterAction {
-
-	/** @var Repository */
-	private $repository;
-
-	/**
-	 * Initializes class attributes
-	 *
-	 * @param Repository $repository
-	 *
-	 * @return void
-	 */
-	public function __construct( Repository $repository ) {
-		$this->repository = $repository;
-	}
 
 	/**
 	 * Triggers the registration of actions and filters when all the plugins are loaded.
@@ -57,8 +42,21 @@ class EditProfile implements RegisterAction {
 	 */
 	public function add_picture_info( $profile ) {
 		wp_enqueue_style( 'wmpp_style', WMPP_PLUGIN_URL . '/assets/css/style.css' );
-		$main_picture  = $this->repository->get_main_picture_by_user_id( $profile->ID );
-		$rest_pictures = $this->repository->get_no_main_pictures_by_user_id( $profile->ID );
+		$main_picture_url = null;
+
+		$main_picture_post_id = get_user_meta( $profile->ID, 'main_picture', true );
+		if ( $main_picture_post_id != false ) {
+			$main_picture_url = get_post( $main_picture_post_id )->guid;
+		}
+
+		$rest_pictures = get_posts( [
+				'numberposts' => - 1,
+				'author'      => $profile->ID,
+				'post_type'   => 'attachment',
+				'exclude'     => $main_picture_post_id != false ? [ $main_picture_post_id ] : []
+			]
+		);
+
 		include( WMPP_DIR_PATH . 'templates/admin/users/edit-profile-display-user-pictures.php' );
 	}
 }

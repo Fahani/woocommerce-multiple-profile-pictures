@@ -1,6 +1,6 @@
 <?php
 /**
- * @var $main_picture array
+ * @var $main_picture string
  * @var $rest_pictures array
  */
 ?>
@@ -10,11 +10,9 @@
     <tr>
         <th><?php _e( 'Main Customer Picture', 'wmpp' ) ?></th>
         <td>
-			<?php if ( ! empty( $main_picture ) ) { ?>
+			<?php if ( ! empty( $main_picture_url ) ) { ?>
                 <div class="padding-05-em inline-block">
-                    <img class="border-1px " alt="Main picture"
-                         src="<?php echo wp_upload_dir()['baseurl'] . "/wmpp/users/{$main_picture[0]['pic_name']}" ?>"><br>
-                    <small class="block">ID: <?php echo $main_picture[0]['mpp_user_picture_id'] ?></small>
+                    <img class="border-1px " alt="Main picture" src="<?php echo $main_picture_url ?>" width="150px"><br>
                 </div>
 			<?php } ?>
         </td>
@@ -24,10 +22,7 @@
         <td>
 			<?php foreach ( $rest_pictures as $picture ) { ?>
                 <div class="inline-block">
-
-                    <img class="border-1px inline-block"
-                         src="<?php echo wp_upload_dir()['baseurl'] . "/wmpp/users/{$picture['pic_name']}" ?>">
-                    <small class="block">ID: <?php echo $picture['mpp_user_picture_id'] ?></small>
+                    <img class="border-1px inline-block" src="<?php echo $picture->guid ?>" width="150px">
                 </div>
 			<?php } ?>
         </td>
