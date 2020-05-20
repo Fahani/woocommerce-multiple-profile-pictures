@@ -2,8 +2,6 @@
 
 namespace WMPP\front;
 
-use WMPP\database\Repository;
-use WMPP\helpers\Utils;
 use WMPP\interfaces\RegisterAction;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
@@ -13,28 +11,6 @@ defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
  * @since 1.0.0
  */
 class MultiUpload implements RegisterAction {
-
-	/** @var array */
-	protected $valid_mimes;
-
-	/** @var array */
-	protected $valid_formats;
-
-	/** @var Repository */
-	private $repository;
-
-	/**
-	 * Initializes class attributes
-	 *
-	 * @param Repository $repository
-	 *
-	 * @since 1.0.0
-	 */
-	public function __construct( Repository $repository ) {
-		$this->repository    = $repository;
-		$this->valid_mimes   = [ 'image/png', 'image/jpeg', 'image/bmp', 'image/x-ms-bmp' ];
-		$this->valid_formats = [ 'png', 'jpeg', 'bmp' ];
-	}
 
 	/**
 	 * Triggers the registration of actions and filters when all the plugins are loaded.
@@ -51,10 +27,75 @@ class MultiUpload implements RegisterAction {
 	 * @since 1.0.0
 	 */
 	public function register_actions_filters() {
-		add_action( 'template_redirect', [ $this, 'update_profile' ], 5 );
 		add_action( 'woocommerce_before_edit_account_form', [ $this, 'enqueue_assets' ] );
-		add_action( 'woocommerce_edit_account_form_tag', [ $this, 'add_multipart_to_form' ] );
 		add_action( 'woocommerce_edit_account_form', [ $this, 'add_picture_selection_to_form' ] );
+
+		add_filter( 'ajax_query_attachments_args', [ $this, 'filter_attachments_by_current_user' ] );
+		add_action( 'wp_ajax_set_main_picture', [ $this, 'ajax_set_main_picture' ] );
+		add_action( 'wp_ajax_delete_main_picture', [ $this, 'ajax_delete_main_picture' ] );
+		add_filter( 'wp_handle_upload_prefilter', [ $this, 'check_if_user_can_upload_more_pictures' ] );
+	}
+
+	/**
+	 * It checks if the user can upload pictures or he reached the max limit already
+	 *
+	 * @param $file
+	 *
+	 * @return mixed
+	 * @since 1.0.0
+	 */
+	function check_if_user_can_upload_more_pictures( $file ) {
+		$max_pictures = get_option( 'max_profile_pictures' );
+		if ( wp_count_posts( 'attachment' )->inherit > $max_pictures ) {
+			$file['error'] = sprintf( __( "You can't upload more than %s pictures" ), $max_pictures );
+		}
+
+		return $file;
+	}
+
+	/**
+	 * Ajax called when the user select a main picture
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	function ajax_set_main_picture() {
+		$user_id = get_current_user_id();
+		if ( isset( $_POST['id'] ) && $user_id ) {
+			$main_picture = get_user_meta( $user_id, 'main_picture' );
+			if ( ! $main_picture ) {
+				add_user_meta( $user_id, 'main_picture', $_POST['id'] );
+			} else {
+				update_user_meta( $user_id, 'main_picture', $_POST['id'] );
+			}
+		}
+	}
+
+	/**
+	 * Ajax called when a customer deletes his profile picture
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	function ajax_delete_main_picture() {
+		$user_id = get_current_user_id();
+		if ( isset( $_POST['id'] ) && $user_id ) {
+			delete_user_meta( $user_id, 'main_picture' );
+		}
+	}
+
+	/**
+	 * It makes sure the customer only sees their own uploaded profile pictures
+	 *
+	 * @param $query
+	 *
+	 * @return mixed
+	 * @since 1.0.0
+	 */
+	function filter_attachments_by_current_user( $query ) {
+		$query['author'] = get_current_user_id();
+
+		return $query;
 	}
 
 	/**
@@ -63,241 +104,9 @@ class MultiUpload implements RegisterAction {
 	 * @since 1.0.0
 	 */
 	public function enqueue_assets() {
+		wp_enqueue_media();
 		wp_enqueue_style( 'wmpp_style', WMPP_PLUGIN_URL . '/assets/css/style.css' );
-	}
-
-	/**
-	 * Processes user's action when submitting the form. Using wmpp post variable to make sure it is our form.
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function update_profile() {
-		if ( isset ( $_POST['wmpp'] ) ) {
-			$this->delete_selected_pictures();
-			$this->set_main_picture();
-			$this->replace_main_picture();
-			$this->upload_new_picture();
-		}
-	}
-
-	/**
-	 * Processes user's action to replace his main picture
-	 *
-	 * @return void
-	 * @since 1.0.0
-	 */
-	private function replace_main_picture() {
-		if ( isset( $_FILES['replace_main_picture'] ) && $_FILES['replace_main_picture']['size'] > 0 ) {
-			$name      = $_FILES['replace_main_picture']['name'];
-			$temp_name = $_FILES['replace_main_picture']['tmp_name'];
-
-			$picture_id = $this->save_picture( $temp_name );
-			if ( $picture_id === false ) {
-				wc_add_notice(
-					sprintf(
-						__( 'There was an error uploading your picture %s', 'wmpp' ),
-						$name ),
-					'error' );
-			} else {
-				$main_picture = $this->repository->get_main_picture_by_user_id( wp_get_current_user()->ID );
-
-				if ( empty( $main_picture ) ) {
-					$this->repository->set_main_picture_by_picture_id( $picture_id );
-					wc_add_notice( __( 'Profile picture replaced', 'wmpp' ), 'success' );
-				} elseif ( $this->delete_from_uploads( $main_picture[0]['pic_name'] ) ) {
-					$this->repository->delete_picture_by_picture_id( $main_picture[0]['mpp_user_picture_id'] );
-					$this->repository->set_main_picture_by_picture_id( $picture_id );
-					wc_add_notice( __( 'Profile picture replaced', 'wmpp' ), 'success' );
-				} else {
-					wc_add_notice(
-						sprintf(
-							__( 'There was an error deleting the picture id(%s)', 'wmpp' ),
-							$main_picture[0]['mpp_user_picture_id']
-						),
-						'error' );
-				}
-			}
-		}
-	}
-
-	/**
-	 * Deletes from folder and from db the checked pictures by the user
-	 * @return void
-	 * @since 1.0.0
-	 */
-	private function delete_selected_pictures() {
-		if ( isset( $_POST['remove'] ) ) {
-			foreach ( $_POST['remove'] as $pic_id ) {
-				$pic_to_remove = $this->repository->get_picture_by_picture_id_and_user_id(
-					$pic_id,
-					wp_get_current_user()->ID
-				);
-
-				if ( empty( $pic_to_remove ) ) {
-					wc_add_notice(
-						sprintf(
-							__( 'You can not delete this picture, id(%s)', 'wmpp' ),
-							$pic_id
-						),
-						'error' );
-					continue;
-				}
-
-				if ( ! $this->delete_from_uploads( $pic_to_remove[0]['pic_name'] ) ) {
-					wc_add_notice(
-						sprintf(
-							__( 'There was an error deleting the picture id(%s)', 'wmpp' ),
-							$pic_id ),
-						'error' );
-					continue;
-				}
-
-				$this->repository->delete_picture_by_picture_id( $pic_id );
-
-				wc_add_notice( sprintf( __( 'Picture deleted id(%s)', 'wmpp' ), $pic_id ), 'success' );
-			}
-		}
-	}
-
-	/**
-	 * Removes a file from the the path: wp-content/uploads/wmpp/users
-	 *
-	 * @param string $filename
-	 *
-	 * @return bool
-	 * @since 1.0.0
-	 */
-	private function delete_from_uploads( $filename ) {
-		return unlink( wp_upload_dir()['basedir'] . '/wmpp/users/' . $filename );
-	}
-
-	/**
-	 * It sets as main profile picture the one selected by the user
-	 * @return void
-	 * @since 1.0.0
-	 */
-	private function set_main_picture() {
-		if ( isset ( $_POST['main'] ) ) {
-			$pic_to_set_main = $this->repository->get_picture_by_picture_id_and_user_id(
-				$_POST['main'],
-				wp_get_current_user()->ID
-			);
-			if ( empty( $pic_to_set_main ) ) {
-				wc_add_notice(
-					sprintf(
-						__( 'The picture id(%s) can not be set as main picture, it does not exist', 'wmpp' ),
-						$_POST['main']
-					)
-					, 'error' );
-			} else {
-				$this->repository->unset_main_picture_by_user_id( wp_get_current_user()->ID );
-				$this->repository->set_main_picture_by_picture_id( $_POST['main'] );
-
-				wc_add_notice(
-					sprintf(
-						__( 'Picture id(%s) set as your main picture.', 'wmpp' ),
-						$_POST['main']
-					),
-					'success' );
-			}
-		}
-	}
-
-	/**
-	 * This function takes care of the action of uploading a new picture
-	 * @return void
-	 * @since 1.0.0
-	 */
-	private function upload_new_picture() {
-		if ( isset ( $_FILES['profile_pictures'] ) && $_FILES['profile_pictures']['size'][0] > 0 ) {
-
-			$num_pics = count( $_FILES['profile_pictures']['size'] );
-
-			for ( $i = 0; $i < $num_pics; $i ++ ) {
-				$name      = $_FILES['profile_pictures']['name'][ $i ];
-				$temp_name = $_FILES['profile_pictures']['tmp_name'][ $i ];
-
-				$num_pics_user = $this->repository->get_number_pics_by_user( wp_get_current_user()->ID );
-				$num_max_pics  = get_option( 'max_profile_pictures' );
-
-				if ( $num_max_pics != - 1 && $num_pics_user >= $num_max_pics ) {
-					wc_add_notice(
-						sprintf(
-							__( 'You have reached the maximum number of pictures you can upload (%s). %s will not be uploaded', 'wmpp' ),
-							$num_max_pics, $name
-						)
-						, 'error' );
-					break;
-				}
-
-				$picture_id = $this->save_picture( $temp_name );
-
-				if ( $picture_id === false ) {
-					continue;
-				}
-
-				wc_add_notice( sprintf( __( 'Your picture %s has been uploaded', 'wmpp' ), $name ), 'success' );
-			}
-		}
-	}
-
-	/**
-	 * This function takes of saving the picture into the uploads folder and into the wp_woocommerce_mpp_user_picture table
-	 *
-	 * @param string $temp_name
-	 *
-	 * @return false|int
-	 */
-	private function save_picture( $temp_name ) {
-		$mime = wp_get_image_mime( $temp_name );
-
-		if ( ! in_array( $mime, $this->valid_mimes ) ) {
-			wc_add_notice(
-				sprintf(
-					__( 'Invalid image format, please try one of these formats: %s', 'wmpp' ),
-					implode( ', ', $this->valid_formats )
-				)
-				, 'error' );
-
-			return false;
-		}
-
-		$editor = wp_get_image_editor( $temp_name );
-
-		if ( is_wp_error( $editor ) ) {
-			wc_add_notice( $editor->get_error_message(), 'error' );
-
-			return false;
-		}
-
-		$result = $editor->resize( 150, 150, false );
-
-		if ( is_wp_error( $result ) ) {
-			wc_add_notice( $editor->get_error_message(), 'error' );
-
-			return false;
-		}
-
-		$final_name = Utils::generate_name( $mime );
-
-		$result = $editor->save( wp_upload_dir()['basedir'] . "/wmpp/users/$final_name" );
-
-		if ( is_wp_error( $result ) ) {
-			wc_add_notice( $editor->get_error_message(), 'error' );
-
-			return false;
-		}
-
-		return $this->repository->insert_picture( wp_get_current_user()->ID, $final_name, $mime, 0 );
-	}
-
-	/**
-	 * Loads the encoding multi part attribute into the form from a template
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function add_multipart_to_form() {
-		include( WMPP_DIR_PATH . 'templates/myaccount/add-multi-part-to-form.php' );
+		wp_enqueue_script( 'wmpp_script', WMPP_PLUGIN_URL . '/assets/js/media_uploader.js' );
 	}
 
 	/**
@@ -307,10 +116,6 @@ class MultiUpload implements RegisterAction {
 	 * @since 1.0.0
 	 */
 	public function add_picture_selection_to_form() {
-		$main_picture  = $this->repository->get_main_picture_by_user_id( wp_get_current_user()->ID );
-		$num_pics_user = $this->repository->get_number_pics_by_user( wp_get_current_user()->ID );
-		$num_max_pics  = get_option( 'max_profile_pictures' );
-		$rest_pictures = $this->repository->get_no_main_pictures_by_user_id( wp_get_current_user()->ID );
 		include( WMPP_DIR_PATH . 'templates/myaccount/add-picture-selection-to-form.php' );
 	}
 
