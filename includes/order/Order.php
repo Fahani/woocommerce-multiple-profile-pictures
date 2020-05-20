@@ -3,7 +3,6 @@
 namespace WMPP\order;
 
 use WC_Order;
-use WMPP\database\Repository;
 use WMPP\helpers\Utils;
 use WMPP\interfaces\RegisterAction;
 
@@ -13,21 +12,6 @@ use WMPP\interfaces\RegisterAction;
  * @package WMPP\order
  */
 class Order implements RegisterAction {
-
-	/** @var Repository */
-	private $repository;
-
-	/**
-	 * Initializes the attributes of the class
-	 *
-	 * @param Repository $repository
-	 *
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function __construct( Repository $repository ) {
-		$this->repository = $repository;
-	}
 
 	/**
 	 * Triggers the registration of actions and filters when all the plugins are loaded.
@@ -58,17 +42,20 @@ class Order implements RegisterAction {
 	 * @param int $order_id
 	 */
 	public function match_picture_to_order( $order_id ) {
-		$main_picture  = $this->repository->get_main_picture_by_user_id( wp_get_current_user()->ID );
-		$order_picture = $this->repository->get_picture_by_order_id( $order_id );
-
+		$user_main_picture_post_id = get_user_meta( get_current_user_id(), 'main_picture', true );
+		$order_picture             = true;
+		if ( $user_main_picture_post_id ) {
+			$order_picture = get_post_meta( $order_id, 'main_picture' );
+		}
 		// Avoid F5 in thank you page
-		if ( ! empty( $main_picture ) && empty( $order_picture ) ) {
-			$destination_name = Utils::generate_name( $main_picture[0]['pic_type'] );
-			$destination_path = wp_upload_dir()['basedir'] . "/wmpp/orders/$destination_name";
-			$source_path      = wp_upload_dir()['basedir'] . "/wmpp/users/{$main_picture[0]['pic_name']}";
+		if ( $user_main_picture_post_id != false && $order_picture == false ) {
+			$user_main_picture = get_post_meta( $user_main_picture_post_id, '_wp_attachment_metadata', true );
+			$origin_path       = wp_upload_dir()['basedir'] . '/' . $user_main_picture['file'];
+			$destination_name  = Utils::generate_name( $user_main_picture['sizes']['thumbnail']['mime-type'] );
+			$destination_path  = wp_upload_dir()['basedir'] . "/wmpp/orders/$destination_name";
 
-			if ( copy( $source_path, $destination_path ) ) {
-				$this->repository->insert_order_picture( $order_id, $destination_name );
+			if ( copy( $origin_path, $destination_path ) ) {
+				add_post_meta( $order_id, 'main_picture', $destination_name );
 			}
 		}
 	}
@@ -83,7 +70,7 @@ class Order implements RegisterAction {
 	 */
 	public function insert_picture_in_order_detail( $order ) {
 		if ( method_exists( $order, 'get_id' ) ) {
-			$order_picture = $this->repository->get_picture_by_order_id( $order->get_id() );
+			$order_picture = get_post_meta( $order->get_id(), 'main_picture', true );
 			if ( ! empty( $order_picture ) ) {
 				include( WMPP_DIR_PATH . 'templates/admin/orders/order-details-display-picture.php' );
 			}
@@ -124,8 +111,9 @@ class Order implements RegisterAction {
 	 */
 	public function insert_picture_in_column( $column, $order_id ) {
 		if ( 'order_profile' === $column ) {
-			$order_picture = $this->repository->get_picture_by_order_id( $order_id );
-			if ( ! empty( $order_picture ) ) {
+			$order_picture = get_post_meta( $order_id, 'main_picture', true );
+
+			if ( $order_picture != false ) {
 				include( WMPP_DIR_PATH . 'templates/admin/orders/order-preview-display-small-picture.php' );
 			}
 		}
@@ -145,11 +133,11 @@ class Order implements RegisterAction {
 		if ( $post_type !== 'shop_order' ) {
 			return;
 		}
+		$order_picture = get_post_meta( $order_id, 'main_picture', true );
 
-		$order_picture = $this->repository->get_picture_by_order_id( $order_id );
-		if ( ! empty( $order_picture ) ) {
-			if ( unlink( wp_upload_dir()['basedir'] . '/wmpp/orders/' . $order_picture[0]['pic_name'] ) ) {
-				$this->repository->delete_order_picture_by_order_id( $order_id );
+		if ( $order_picture != false ) {
+			if ( unlink( wp_upload_dir()['basedir'] . '/wmpp/orders/' . $order_picture ) ) {
+				delete_post_meta($order_id, 'main_picture');
 			}
 		}
 	}
