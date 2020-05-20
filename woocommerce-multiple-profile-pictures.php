@@ -17,7 +17,6 @@
 
 use WMPP\base\Activate;
 use WMPP\base\Init;
-use WMPP\database\ActivationRepository;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
 
@@ -38,7 +37,7 @@ define( 'WMPP_BASENAME', plugin_basename( __FILE__ ) );
  * @since 1.0.0
  */
 function activate_wmpp_plugin() {
-	$activate = new Activate( new ActivationRepository() );
+	$activate = new Activate();
 	$activate->activate();
 }
 

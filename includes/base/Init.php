@@ -3,12 +3,10 @@
 namespace WMPP\base;
 
 
-use WMPP\admin\DeleteUser;
 use WMPP\admin\EditProfile;
 use WMPP\admin\RequirementsNotification;
 use WMPP\admin\Settings;
 use WMPP\API\Api;
-use WMPP\database\Repository;
 use WMPP\front\MultiUpload;
 use WMPP\order\Order;
 use WMPP\translations\EnableTranslations;
@@ -30,11 +28,10 @@ final class Init {
 			new RequirementsNotification(),
 			new EnableTranslations(),
 			new Settings(),
-			new MultiUpload( new Repository() ),
-			new EditProfile( new Repository() ),
-			new DeleteUser( new Repository() ),
-			new Api( new Repository() ),
-			new Order( new Repository() )
+			new MultiUpload(),
+			new EditProfile(),
+			new Api(),
+			new Order()
 		];
 	}
 
