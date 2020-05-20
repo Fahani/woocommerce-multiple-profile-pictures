@@ -4,8 +4,6 @@ namespace WMPP\base;
 
 defined( 'ABSPATH' ) or die( 'This is not what you are looking for' );
 
-use WMPP\database\ActivationRepository;
-
 /**
  * This class takes care of the activation process
  * @package WMPP\base
@@ -25,30 +23,14 @@ class Activate {
 	/** minimum WooCommerce version required by this plugin */
 	private const MINIMUM_WC_VERSION = '3.0.9';
 
-	/** @var ActivationRepository */
-	private $activation_repository;
-
 	/**
-	 * Activate constructor.
-	 *
-	 * @param ActivationRepository $activation_repository
-	 *
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function __construct( ActivationRepository $activation_repository ) {
-		$this->activation_repository = $activation_repository;
-	}
-
-	/**
-	 * Execute the actions to activate the plugin: checks, create table and directory structure
+	 * Execute the actions to activate the plugin: checks, directory structure, etc
 	 */
 	public function activate() {
 		$this->activation_check();
-		$this->activation_repository->create_tables();
 		$this->create_directories();
-
 		$this->allow_customer_upload();
+		$this->set_max_pictures_default();
 	}
 
 	/**
@@ -104,9 +86,6 @@ class Activate {
 		if ( ! is_dir( wp_upload_dir()['basedir'] . '/wmpp' ) ) {
 			mkdir( wp_upload_dir()['basedir'] . '/wmpp', 0755 );
 		}
-		if ( ! is_dir( wp_upload_dir()['basedir'] . '/wmpp/users' ) ) {
-			mkdir( wp_upload_dir()['basedir'] . '/wmpp/users', 0755 );
-		}
 		if ( ! is_dir( wp_upload_dir()['basedir'] . '/wmpp/orders' ) ) {
 			mkdir( wp_upload_dir()['basedir'] . '/wmpp/orders', 0755 );
 		}
@@ -120,8 +99,18 @@ class Activate {
 	private function allow_customer_upload() {
 		$customer = get_role( 'customer' );
 		if ( $customer ) {
-			$customer->add_cap('upload_files');
-			$customer->add_cap('delete_posts');
+			$customer->add_cap( 'upload_files' );
+			$customer->add_cap( 'delete_posts' );
 		}
+	}
+
+	/**
+	 * Sets the number of pictures an user can upload by default
+	 *
+	 * @return void
+	 * @since 1.0.0
+	 */
+	private function set_max_pictures_default() {
+		add_option('max_profile_pictures', 3);
 	}
 }
