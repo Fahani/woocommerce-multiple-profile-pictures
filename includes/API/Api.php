@@ -2,7 +2,6 @@
 
 namespace WMPP\API;
 
-use WMPP\database\Repository;
 use WMPP\interfaces\RegisterAction;
 use WP_Error;
 
@@ -12,21 +11,6 @@ use WP_Error;
  * @package WMPP\API
  */
 class Api implements RegisterAction {
-
-	/** @var Repository */
-	private $repository;
-
-	/**
-	 * Initializes the variables
-	 *
-	 * @param Repository $repository
-	 *
-	 * @return void
-	 * @since 1.0.0
-	 */
-	public function __construct( Repository $repository ) {
-		$this->repository = $repository;
-	}
 
 	/**
 	 * Triggers the registration of actions and filters when all the plugins are loaded.
@@ -66,7 +50,19 @@ class Api implements RegisterAction {
 	 * @since 1.0.0
 	 */
 	public function return_profile_pictures() {
-		return rest_ensure_response( $this->repository->get_main_profile_pictures() );
+		$users_with_main_picture = get_users( [ 'meta_key' => 'main_picture' ] );
+		$response                = [];
+		foreach ( $users_with_main_picture as $user ) {
+			$main_picture_post_id = get_user_meta( $user->ID, 'main_picture', true );
+			$attachment           = get_post_meta( $main_picture_post_id, '_wp_attachment_metadata', true );
+			$response[]           = [
+				'user_id'  => $user->ID,
+				'pic_name' => $attachment['file'],
+				'pic_mime' => $attachment['sizes']['thumbnail']['mime-type']
+			];
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 	/**
