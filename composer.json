@@ -15,5 +15,9 @@
         "psr-4": {
             "WMPP\\": "includes/"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7@dev",
+        "wp-cli/wp-cli-bundle": "*"
     }
 }
