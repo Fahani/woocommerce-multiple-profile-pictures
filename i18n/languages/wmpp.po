@@ -70,16 +70,22 @@ msgstr ""
 msgid "Customer's other pictures"
 msgstr ""
 
-#: templates/myaccount/add-picture-selection-to-form.php:12
-#: templates/myaccount/add-picture-selection-to-form.php:13
+#: templates/myaccount/add-picture-selection-to-form.php:11
+msgid "Upload a profile picture and get awesome discounts in your purchases!"
+msgstr ""
+
+#: templates/myaccount/add-picture-selection-to-form.php:14
+#: templates/myaccount/add-picture-selection-to-form.php:15
 msgid "Your default picture"
 msgstr ""
 
-#: templates/myaccount/add-picture-selection-to-form.php:17
-#: templates/myaccount/add-picture-selection-to-form.php:20
+#: templates/myaccount/add-picture-selection-to-form.php:19
+#: templates/myaccount/add-picture-selection-to-form.php:22
 msgid "Your main profile picture"
 msgstr ""
 
-#: templates/myaccount/add-picture-selection-to-form.php:26
+#: templates/myaccount/add-picture-selection-to-form.php:28
 msgid "MANAGE YOUR PICTURES HERE"
 msgstr ""
+
+
