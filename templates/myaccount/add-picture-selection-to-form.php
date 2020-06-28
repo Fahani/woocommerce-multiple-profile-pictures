@@ -5,7 +5,7 @@ $main_picture_meta    = null;
 if ( $main_picture_post_id != false ) {
 	$main_picture_url = get_post( $main_picture_post_id )->guid;
 }
-$num_max_pics = get_option( 'max_profile_pictures' );
+//$num_max_pics = get_option( 'max_profile_pictures' );
 ?>
 
 <?php if ( ! $main_picture_post_id ) { ?>
