@@ -71,7 +71,7 @@ msgid "Customer's other pictures"
 msgstr ""
 
 #: templates/myaccount/add-picture-selection-to-form.php:11
-msgid "Upload a profile picture and get awesome discounts in your purchases!"
+msgid "Upload a profile picture and get awesome discounts on your purchases!"
 msgstr ""
 
 #: templates/myaccount/add-picture-selection-to-form.php:14

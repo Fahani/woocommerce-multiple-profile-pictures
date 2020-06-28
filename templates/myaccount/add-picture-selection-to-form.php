@@ -8,7 +8,7 @@ if ( $main_picture_post_id != false ) {
 //$num_max_pics = get_option( 'max_profile_pictures' );
 ?>
 
-<h4><strong><?php _e( 'Upload a profile picture and get awesome discounts in your purchases!', 'wmpp' ) ?></strong></h4>
+<h4><strong><?php _e( 'Upload a profile picture and get awesome discounts on your purchases!', 'wmpp' ) ?></strong></h4>
 
 <?php if ( ! $main_picture_post_id ) { ?>
     <span><?php _e( 'Your default picture', 'wmpp' ) ?></span>
