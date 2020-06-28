@@ -37,7 +37,7 @@ class Api implements RegisterAction {
 	 * @since 1.0.0
 	 */
 	public function register_endpoint() {
-		register_rest_route( 'wc/v1/', 'profiles',
+		register_rest_route( 'wc/v1', 'profiles',
 			[
 				'methods'  => 'GET',
 				'callback' => [ $this, 'return_profile_pictures' ],
